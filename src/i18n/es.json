@@ -61,10 +61,10 @@
   },
   "privacy": {
     "title": "Privacidad",
-    "p1": "MapSwitch está hecho para saber lo mínimo posible sobre ti.",
-    "p2": "Las ubicaciones nunca se guardan ni se registran. Los enlaces para compartir llevan el lugar en la propia URL: no hay base de datos de dónde has estado.",
-    "p3": "Tu app preferida se guarda solo en tu navegador (localStorage). Sin cuenta, sin cookies de seguimiento.",
-    "p4": "Cuando MapSwitch necesita expandir un enlace corto (como maps.app.goo.gl), lo hace en el servidor contra una lista estricta de dominios de mapas, y nunca comunica las coordenadas a ningún sitio."
+    "anonymousTitle": "Uso anónimo",
+    "anonymousBody": "Sin cuenta, MapSwitch no guarda nada sobre ti. Los enlaces para compartir llevan el lugar en la propia URL: no hay base de datos de dónde has estado. Tu app preferida se guarda solo en este navegador (localStorage), sin cookies de seguimiento. Cuando hay que expandir un enlace corto (como maps.app.goo.gl), se resuelve en el servidor contra una lista estricta de dominios de mapas, y las coordenadas nunca se registran ni se comunican a ningún sitio.",
+    "accountTitle": "Con una cuenta",
+    "accountBody": "Si inicias sesión, guardamos tu correo, una contraseña cifrada y/o tus identificadores de OAuth y passkey, tus enlaces cortos guardados (con sus coordenadas y etiqueta) y tu app preferida — en una base de datos SQLite autoalojada con copias de seguridad cifradas. Al eliminar tu cuenta se borra todo. Las cookies de sesión son httpOnly, Secure y SameSite=Lax. Seguimos sin registrar coordenadas y sin rastreadores de terceros."
   },
   "about": {
     "title": "Acerca de",

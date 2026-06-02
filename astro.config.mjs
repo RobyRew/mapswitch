@@ -24,17 +24,10 @@ export default defineConfig({
   // it explicit and guard against a future config regression).
   security: { checkOrigin: true },
 
-  // ── Locale routing ────────────────────────────────────────────────
-  // Same shape as the portfolio: four locales, EN default served at /en/.
-  i18n: {
-    locales: ['en', 'es', 'ca', 'ro'],
-    defaultLocale: 'en',
-    routing: {
-      prefixDefaultLocale: true,
-      redirectToDefaultLocale: false,
-    },
-  },
-
+  // Locale routing is handled manually via the src/pages/[lang]/ tree + our own
+  // i18n utils (t/path). We deliberately do NOT use Astro's `i18n` config: with
+  // prefixDefaultLocale it marks top-level routes (/o, /x/:slug) as 404 even when
+  // they render. Plain dynamic [lang] routing avoids that.
   integrations: [react()],
 
   vite: {

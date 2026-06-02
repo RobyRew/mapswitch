@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { buildShareUrl } from '@/lib/share/encode';
 import { parseLatLngPair } from '@/lib/parse/coords';
+import { authClient } from '@/lib/auth/client';
 
 export interface ShareStrings {
   latlngPlaceholder: string;
@@ -12,21 +13,36 @@ export interface ShareStrings {
   copied: string;
   invalid: string;
   yourLink: string;
+  saveShorten: string;
+  yourShortLink: string;
+  loginRequired: string;
+  signIn: string;
 }
 
-export default function ShareLinkGenerator({ baseUrl, strings }: { baseUrl: string; strings: ShareStrings }) {
+export default function ShareLinkGenerator({
+  baseUrl,
+  loginPath,
+  strings,
+}: {
+  baseUrl: string;
+  loginPath: string;
+  strings: ShareStrings;
+}) {
+  const { data: session } = authClient.useSession();
   const [coords, setCoords] = useState('');
   const [label, setLabel] = useState('');
   const [link, setLink] = useState<string | null>(null);
+  const [shortLink, setShortLink] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [copied, setCopied] = useState<'long' | 'short' | null>(null);
 
   const origin = typeof window !== 'undefined' ? window.location.origin : baseUrl;
 
   function generate() {
     setError(null);
-    setCopied(false);
+    setCopied(null);
     const pair = parseLatLngPair(coords);
     if (!pair) {
       setError(strings.invalid);
@@ -34,6 +50,31 @@ export default function ShareLinkGenerator({ baseUrl, strings }: { baseUrl: stri
       return;
     }
     setLink(buildShareUrl(origin, { ...pair, label: label.trim() || undefined }));
+  }
+
+  async function saveShorten() {
+    setError(null);
+    setCopied(null);
+    const pair = parseLatLngPair(coords);
+    if (!pair) {
+      setError(strings.invalid);
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch('/api/links', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ lat: pair.lat, lng: pair.lng, label: label.trim() || undefined }),
+      });
+      const data = (await res.json()) as { url?: string };
+      if (res.ok && data.url) setShortLink(data.url);
+      else setError(strings.invalid);
+    } catch {
+      setError(strings.invalid);
+    } finally {
+      setSaving(false);
+    }
   }
 
   function useLocation() {
@@ -55,15 +96,17 @@ export default function ShareLinkGenerator({ baseUrl, strings }: { baseUrl: stri
     );
   }
 
-  async function copy() {
-    if (!link) return;
+  async function copy(value: string, which: 'long' | 'short') {
     try {
-      await navigator.clipboard.writeText(link);
-      setCopied(true);
+      await navigator.clipboard.writeText(value);
+      setCopied(which);
     } catch {
       /* ignore */
     }
   }
+
+  const inputCls =
+    'w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base text-text outline-none focus:border-accent';
 
   return (
     <div className="flex flex-col gap-3">
@@ -71,14 +114,13 @@ export default function ShareLinkGenerator({ baseUrl, strings }: { baseUrl: stri
         value={coords}
         onChange={(e) => setCoords(e.target.value)}
         placeholder={strings.latlngPlaceholder}
-        inputMode="text"
-        className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base text-text outline-none focus:border-accent"
+        className={inputCls}
       />
       <input
         value={label}
         onChange={(e) => setLabel(e.target.value)}
         placeholder={strings.labelPlaceholder}
-        className="w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base text-text outline-none focus:border-accent"
+        className={inputCls}
       />
 
       <div className="flex flex-wrap gap-2">
@@ -107,10 +149,43 @@ export default function ShareLinkGenerator({ baseUrl, strings }: { baseUrl: stri
           <code className="block break-all text-sm text-text">{link}</code>
           <button
             type="button"
-            onClick={copy}
+            onClick={() => copy(link, 'long')}
             className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-text hover:bg-accent-hover"
           >
-            {copied ? strings.copied : strings.copy}
+            {copied === 'long' ? strings.copied : strings.copy}
+          </button>
+        </div>
+      )}
+
+      {/* Save & shorten — signed-in only */}
+      {session?.user ? (
+        <button
+          type="button"
+          onClick={saveShorten}
+          disabled={saving}
+          className="rounded-lg border border-border px-4 py-2.5 font-medium text-text hover:bg-surface-2 disabled:opacity-60"
+        >
+          {strings.saveShorten}
+        </button>
+      ) : (
+        <p className="text-xs text-text-3">
+          {strings.loginRequired}{' '}
+          <a href={loginPath} className="text-accent hover:text-accent-hover">
+            {strings.signIn}
+          </a>
+        </p>
+      )}
+
+      {shortLink && (
+        <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 p-4">
+          <span className="text-xs text-text-3">{strings.yourShortLink}</span>
+          <code className="block break-all text-sm text-text">{shortLink}</code>
+          <button
+            type="button"
+            onClick={() => copy(shortLink, 'short')}
+            className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-text hover:bg-accent-hover"
+          >
+            {copied === 'short' ? strings.copied : strings.copy}
           </button>
         </div>
       )}

@@ -9,12 +9,20 @@ export function getStaticPaths() {
 
 const { lang } = Astro.params;
 const locale: Locale = isLocale(lang) ? lang : 'en';
-const paragraphs = ['privacy.p1', 'privacy.p2', 'privacy.p3', 'privacy.p4'];
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'privacy.title')}>
-  <section class="flex flex-col gap-4">
+  <section class="flex flex-col gap-6">
     <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'privacy.title')}</h1>
-    {paragraphs.map((key) => <p class="text-text-2 leading-relaxed">{t(locale, key)}</p>)}
+
+    <div class="flex flex-col gap-2">
+      <h2 class="text-lg font-semibold text-text">{t(locale, 'privacy.anonymousTitle')}</h2>
+      <p class="leading-relaxed text-text-2">{t(locale, 'privacy.anonymousBody')}</p>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <h2 class="text-lg font-semibold text-text">{t(locale, 'privacy.accountTitle')}</h2>
+      <p class="leading-relaxed text-text-2">{t(locale, 'privacy.accountBody')}</p>
+    </div>
   </section>
 </BaseLayout>

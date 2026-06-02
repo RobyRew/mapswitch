@@ -4,6 +4,7 @@ import { isLocale, type Locale, t, path } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AccountPanel from '@/islands/AccountPanel';
 import DefaultAppManager from '@/islands/DefaultAppManager';
+import HistoryList from '@/islands/HistoryList';
 import { getUser } from '@/lib/auth/session';
 
 const { lang } = Astro.params;
@@ -26,6 +27,14 @@ const managerStrings = {
   reset: t(locale, 'manager.reset'),
   autoOpen: t(locale, 'manager.autoOpen'),
 };
+const historyStrings = {
+  history: t(locale, 'account.history'),
+  historyEmpty: t(locale, 'account.historyEmpty'),
+  copy: t(locale, 'account.copy'),
+  copied: t(locale, 'account.copied'),
+  delete: t(locale, 'account.delete'),
+};
+const base = import.meta.env.PUBLIC_SITE_URL || Astro.url.origin;
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'account.myAccount')}>
@@ -33,5 +42,6 @@ const managerStrings = {
     <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'account.myAccount')}</h1>
     <AccountPanel client:load email={user.email} strings={accountStrings} loginPath={path(locale, 'account/login')} />
     <DefaultAppManager client:load strings={managerStrings} />
+    <HistoryList client:load strings={historyStrings} baseUrl={base} />
   </section>
 </BaseLayout>

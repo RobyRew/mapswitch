@@ -1,6 +1,6 @@
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import { getDb } from './client';
+import { getDb, type DB } from './client';
 import { preferences, savedLinks, linkHistory } from './schema';
 import type { Store, SavedLink, NewLink } from './store';
 
@@ -20,8 +20,8 @@ function rowToLink(r: LinkRow): SavedLink {
 }
 
 // All queries go through Drizzle's builder (parameterized) — no string concatenation.
-export function createDrizzleStore(): Store {
-  const db = getDb();
+// `db` is injectable so the store can be unit-tested against an in-memory SQLite.
+export function createDrizzleStore(db: DB = getDb()): Store {
   return {
     preferences: {
       async get(userId) {

@@ -61,10 +61,10 @@
   },
   "privacy": {
     "title": "Privacy",
-    "p1": "MapSwitch is built to know as little about you as possible.",
-    "p2": "Locations are never stored or logged. Share links carry the place in the URL itself — there is no database of where you've been.",
-    "p3": "Your preferred app is saved only in your browser (localStorage). No account, no cookies for tracking.",
-    "p4": "When MapSwitch needs to expand a shortened link (like maps.app.goo.gl), it does so on the server against a strict allow-list of map domains, and never reports the coordinates anywhere."
+    "anonymousTitle": "Anonymous use",
+    "anonymousBody": "Without an account, MapSwitch stores nothing about you. Share links carry the place in the URL itself — there is no database of where you've been. Your preferred app is saved only in this browser (localStorage), with no tracking cookies. When a shortened link (like maps.app.goo.gl) needs expanding, it's resolved on the server against a strict allow-list of map domains, and the coordinates are never logged or reported anywhere.",
+    "accountTitle": "With an account",
+    "accountBody": "If you sign in, we store your email, a hashed password and/or your OAuth and passkey identifiers, your saved short links (with their coordinates and label), and your app preference — in a self-hosted SQLite database with encrypted off-site backups. Deleting your account removes all of it. Session cookies are httpOnly, Secure and SameSite=Lax. We still never log coordinates and use no third-party trackers."
   },
   "about": {
     "title": "About",

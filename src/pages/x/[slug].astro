@@ -3,13 +3,22 @@ export const prerender = false;
 import { isLocale, DEFAULT_LOCALE, type Locale, t } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import OpenHandler from '@/islands/OpenHandler';
-import { decodeShareParams } from '@/lib/share/encode';
+import { getStore } from '@/lib/db';
+import type { Match } from '@/lib/providers/types';
 
-// Decode the place from the URL on the server — nothing is stored or logged.
-const match = decodeShareParams(Astro.url.searchParams);
-// This top-level route lives outside the /[lang]/ tree; with prefixDefaultLocale
-// Astro would otherwise mark it 404. Set the real status explicitly.
-Astro.response.status = match ? 200 : 404;
+const slug = Astro.params.slug ?? '';
+const store = getStore();
+
+let match: Match | null = null;
+if (/^[A-Za-z0-9_-]{6,16}$/.test(slug) && store) {
+  const link = await store.links.get(slug);
+  if (link && (!link.expiresAt || link.expiresAt > Date.now())) {
+    await store.links.incrementHit(slug);
+    match = { lat: link.lat, lng: link.lng, label: link.label, source: 'slug' };
+  }
+}
+Astro.response.status = match ? 200 : 404; // 404 for missing/expired slugs
+
 const langParam = Astro.url.searchParams.get('lang') ?? undefined;
 const locale: Locale = isLocale(langParam) ? langParam : DEFAULT_LOCALE;
 
