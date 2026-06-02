@@ -20,6 +20,10 @@ export default defineConfig({
   trailingSlash: 'ignore',
   compressHTML: true,
 
+  // CSRF: reject cross-origin form/JSON POSTs (Astro v5 default; pinned to make
+  // it explicit and guard against a future config regression).
+  security: { checkOrigin: true },
+
   // ── Locale routing ────────────────────────────────────────────────
   // Same shape as the portfolio: four locales, EN default served at /en/.
   i18n: {

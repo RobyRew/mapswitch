@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { safeExpand, ExpandError } from '@/lib/expand/safeExpand';
+import { readJson, HttpError } from '@/lib/http/guard';
 
 export const prerender = false;
 
@@ -20,8 +21,9 @@ function json(data: unknown, status = 200): Response {
 export const POST: APIRoute = async ({ request }) => {
   let raw: unknown;
   try {
-    raw = await request.json();
-  } catch {
+    raw = await readJson(request);
+  } catch (err) {
+    if (err instanceof HttpError) return json({ error: err.code }, err.status);
     return json({ error: 'invalid_json' }, 400);
   }
 
