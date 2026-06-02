@@ -1,0 +1,36 @@
+---
+export const prerender = true;
+import { LOCALES, isLocale, type Locale, t } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ShareLinkGenerator from '@/islands/ShareLinkGenerator';
+
+export function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const locale: Locale = isLocale(lang) ? lang : 'en';
+const base = import.meta.env.PUBLIC_SITE_URL || Astro.url.origin;
+
+const strings = {
+  latlngPlaceholder: t(locale, 'share.latlngPlaceholder'),
+  labelPlaceholder: t(locale, 'share.labelPlaceholder'),
+  useLocation: t(locale, 'share.useLocation'),
+  locating: t(locale, 'share.locating'),
+  generate: t(locale, 'share.generate'),
+  copy: t(locale, 'share.copy'),
+  copied: t(locale, 'share.copied'),
+  invalid: t(locale, 'share.invalid'),
+  yourLink: t(locale, 'share.yourLink'),
+};
+---
+
+<BaseLayout locale={locale} title={t(locale, 'share.title')}>
+  <section class="flex flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'share.title')}</h1>
+      <p class="text-text-2">{t(locale, 'share.subtitle')}</p>
+    </div>
+    <ShareLinkGenerator client:load baseUrl={base} strings={strings} />
+  </section>
+</BaseLayout>

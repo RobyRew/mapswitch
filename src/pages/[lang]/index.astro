@@ -1,0 +1,44 @@
+---
+export const prerender = true;
+import { LOCALES, isLocale, type Locale, t, path } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PasteBox from '@/islands/PasteBox';
+
+export function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const locale: Locale = isLocale(lang) ? lang : 'en';
+
+const pasteStrings = {
+  placeholder: t(locale, 'paste.placeholder'),
+  resolve: t(locale, 'paste.resolve'),
+  resolving: t(locale, 'paste.resolving'),
+  paste: t(locale, 'paste.paste'),
+  error: t(locale, 'paste.error'),
+  chooser: {
+    openIn: t(locale, 'chooser.openIn'),
+    remember: t(locale, 'chooser.remember'),
+    unavailable: t(locale, 'chooser.unavailable'),
+  },
+};
+---
+
+<BaseLayout locale={locale} title={t(locale, 'home.title')}>
+  <section class="flex flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'home.title')}</h1>
+      <p class="text-text-2">{t(locale, 'home.subtitle')}</p>
+    </div>
+
+    <PasteBox client:load strings={pasteStrings} />
+
+    <a
+      href={path(locale, 'share')}
+      class="text-sm font-medium text-accent hover:text-accent-hover"
+    >
+      {t(locale, 'home.shareTitle')} →
+    </a>
+  </section>
+</BaseLayout>

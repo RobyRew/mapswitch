@@ -1,0 +1,20 @@
+---
+export const prerender = true;
+import { LOCALES, isLocale, type Locale, t } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const locale: Locale = isLocale(lang) ? lang : 'en';
+const paragraphs = ['privacy.p1', 'privacy.p2', 'privacy.p3', 'privacy.p4'];
+---
+
+<BaseLayout locale={locale} title={t(locale, 'privacy.title')}>
+  <section class="flex flex-col gap-4">
+    <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'privacy.title')}</h1>
+    {paragraphs.map((key) => <p class="text-text-2 leading-relaxed">{t(locale, key)}</p>)}
+  </section>
+</BaseLayout>

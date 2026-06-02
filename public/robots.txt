@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+# Redirect endpoints may carry coordinates — keep them out of indexes.
+Disallow: /o
+Disallow: /api

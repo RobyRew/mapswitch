@@ -1,0 +1,31 @@
+---
+export const prerender = true;
+import { LOCALES, isLocale, type Locale, t } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import DefaultAppManager from '@/islands/DefaultAppManager';
+
+export function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const locale: Locale = isLocale(lang) ? lang : 'en';
+
+const strings = {
+  defaultLabel: t(locale, 'manager.defaultLabel'),
+  none: t(locale, 'manager.none'),
+  change: t(locale, 'manager.change'),
+  reset: t(locale, 'manager.reset'),
+  autoOpen: t(locale, 'manager.autoOpen'),
+};
+---
+
+<BaseLayout locale={locale} title={t(locale, 'settings.title')}>
+  <section class="flex flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'settings.title')}</h1>
+      <p class="text-text-2">{t(locale, 'settings.subtitle')}</p>
+    </div>
+    <DefaultAppManager client:load strings={strings} />
+  </section>
+</BaseLayout>

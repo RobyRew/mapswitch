@@ -1,0 +1,22 @@
+{
+  "site": {
+    "name": "MapSwitch",
+    "tagline": "Obre qualsevol ubicació a l'app de mapes que tu prefereixis."
+  },
+  "nav": {
+    "home": "Inici",
+    "share": "Compartir un lloc",
+    "settings": "Configuració",
+    "privacy": "Privadesa",
+    "about": "Quant a"
+  },
+  "home": {
+    "title": "Obre qualsevol enllaç de mapes a la teva app",
+    "subtitle": "Enganxa un enllaç de Google, Apple, Waze o Yandex —o coordenades, o un Plus Code— i tria l'app que vulguis."
+  },
+  "chooser": {
+    "openIn": "Obre a…",
+    "remember": "Recorda la meva elecció",
+    "unavailable": "No en aquest dispositiu"
+  }
+}

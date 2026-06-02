@@ -1,0 +1,77 @@
+{
+  "site": {
+    "name": "MapSwitch",
+    "tagline": "Abre cualquier ubicación en la app de mapas que tú prefieras."
+  },
+  "nav": {
+    "home": "Inicio",
+    "share": "Compartir un lugar",
+    "settings": "Ajustes",
+    "privacy": "Privacidad",
+    "about": "Acerca de"
+  },
+  "home": {
+    "title": "Abre cualquier enlace de mapas en tu app",
+    "subtitle": "Pega un enlace de Google, Apple, Waze o Yandex —o coordenadas, o un Plus Code— y elige la app que quieras. O crea un enlace neutro que otros puedan abrir en su propia app.",
+    "receiverTitle": "Me han pasado un enlace",
+    "shareTitle": "Mejor compartir un lugar"
+  },
+  "paste": {
+    "placeholder": "Pega un enlace de mapas, \"lat, lng\" o un Plus Code…",
+    "resolve": "Buscar lugar",
+    "resolving": "Resolviendo…",
+    "paste": "Pegar",
+    "error": "No se pudo leer una ubicación. Prueba con otro enlace o pega coordenadas como 48.8584, 2.2945."
+  },
+  "chooser": {
+    "openIn": "Abrir en…",
+    "remember": "Recordar mi elección",
+    "unavailable": "No en este dispositivo"
+  },
+  "share": {
+    "title": "Compartir un lugar",
+    "subtitle": "Crea un enlace neutro. Quien lo abra elige su propia app de mapas.",
+    "latlngPlaceholder": "lat, lng  (ej. 48.8584, 2.2945)",
+    "labelPlaceholder": "Etiqueta (opcional)",
+    "useLocation": "Usar mi ubicación actual",
+    "locating": "Localizando…",
+    "generate": "Crear enlace",
+    "copy": "Copiar enlace",
+    "copied": "¡Copiado!",
+    "invalid": "Introduce coordenadas válidas como \"lat, lng\".",
+    "yourLink": "Tu enlace para compartir"
+  },
+  "open": {
+    "openingIn": "Abriendo en {{app}}…",
+    "openNow": "Abrir ahora",
+    "chooseDifferent": "Elegir otra app",
+    "noLocation": "Este enlace no contiene ninguna ubicación."
+  },
+  "manager": {
+    "defaultLabel": "App por defecto",
+    "none": "Preguntar siempre",
+    "change": "Cambiar",
+    "reset": "Restablecer",
+    "autoOpen": "Abrir automáticamente la próxima vez"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "subtitle": "Gestiona tu app de mapas por defecto. Se guarda solo en este navegador, en ningún otro sitio."
+  },
+  "privacy": {
+    "title": "Privacidad",
+    "p1": "MapSwitch está hecho para saber lo mínimo posible sobre ti.",
+    "p2": "Las ubicaciones nunca se guardan ni se registran. Los enlaces para compartir llevan el lugar en la propia URL: no hay base de datos de dónde has estado.",
+    "p3": "Tu app preferida se guarda solo en tu navegador (localStorage). Sin cuenta, sin cookies de seguimiento.",
+    "p4": "Cuando MapSwitch necesita expandir un enlace corto (como maps.app.goo.gl), lo hace en el servidor contra una lista estricta de dominios de mapas, y nunca comunica las coordenadas a ningún sitio."
+  },
+  "about": {
+    "title": "Acerca de",
+    "p1": "Alguien te envía un enlace de Google Maps, pero tú prefieres Apple Maps, Waze o Radarbot. MapSwitch lee la ubicación de cualquier enlace de mapas y te deja abrirla donde quieras.",
+    "p2": "También funciona al revés: comparte un enlace neutro y quien lo abra elige su propia app.",
+    "p3": "Abierto, autoalojado y centrado en la privacidad. Se pueden añadir nuevas apps de mapas una a una."
+  },
+  "footer": {
+    "madeBy": "Autoalojado · abierto · privacidad primero"
+  }
+}

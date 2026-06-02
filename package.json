@@ -1,0 +1,44 @@
+{
+  "name": "mapswitch",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Universal map link redirector — open any location in your preferred maps app",
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0 --port 5176",
+    "build": "astro check && astro build",
+    "preview": "node ./dist/server/entry.mjs",
+    "astro": "astro",
+    "check": "astro check",
+    "lint": "eslint .",
+    "typecheck": "astro check && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.0.0",
+    "@astrojs/react": "^4.4.2",
+    "astro": "^5.18.1",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@eslint/js": "^9.18.0",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.18.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.20.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

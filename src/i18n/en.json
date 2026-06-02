@@ -1,0 +1,77 @@
+{
+  "site": {
+    "name": "MapSwitch",
+    "tagline": "Open any location in the map app you actually like."
+  },
+  "nav": {
+    "home": "Home",
+    "share": "Share a place",
+    "settings": "Settings",
+    "privacy": "Privacy",
+    "about": "About"
+  },
+  "home": {
+    "title": "Open any map link in your app",
+    "subtitle": "Paste a Google, Apple, Waze or Yandex link — or coordinates, or a Plus Code — and pick the app you want. Or make a neutral link others can open in their own app.",
+    "receiverTitle": "I got a map link",
+    "shareTitle": "Share a place instead"
+  },
+  "paste": {
+    "placeholder": "Paste a map link, \"lat, lng\", or a Plus Code…",
+    "resolve": "Find place",
+    "resolving": "Resolving…",
+    "paste": "Paste",
+    "error": "Couldn't read a location from that. Try another link, or paste coordinates like 48.8584, 2.2945."
+  },
+  "chooser": {
+    "openIn": "Open in…",
+    "remember": "Remember my choice",
+    "unavailable": "Not on this device"
+  },
+  "share": {
+    "title": "Share a place",
+    "subtitle": "Create a neutral link. Whoever opens it picks their own map app.",
+    "latlngPlaceholder": "lat, lng  (e.g. 48.8584, 2.2945)",
+    "labelPlaceholder": "Label (optional)",
+    "useLocation": "Use my current location",
+    "locating": "Locating…",
+    "generate": "Create link",
+    "copy": "Copy link",
+    "copied": "Copied!",
+    "invalid": "Enter valid coordinates as \"lat, lng\".",
+    "yourLink": "Your shareable link"
+  },
+  "open": {
+    "openingIn": "Opening in {{app}}…",
+    "openNow": "Open now",
+    "chooseDifferent": "Choose a different app",
+    "noLocation": "This link has no location in it."
+  },
+  "manager": {
+    "defaultLabel": "Default app",
+    "none": "Ask every time",
+    "change": "Change",
+    "reset": "Reset",
+    "autoOpen": "Open it automatically next time"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your default map app. This is stored only in this browser — nowhere else."
+  },
+  "privacy": {
+    "title": "Privacy",
+    "p1": "MapSwitch is built to know as little about you as possible.",
+    "p2": "Locations are never stored or logged. Share links carry the place in the URL itself — there is no database of where you've been.",
+    "p3": "Your preferred app is saved only in your browser (localStorage). No account, no cookies for tracking.",
+    "p4": "When MapSwitch needs to expand a shortened link (like maps.app.goo.gl), it does so on the server against a strict allow-list of map domains, and never reports the coordinates anywhere."
+  },
+  "about": {
+    "title": "About",
+    "p1": "Someone sends you a Google Maps link, but you'd rather use Apple Maps, Waze or Radarbot. MapSwitch reads the location out of any map link and lets you open it wherever you like.",
+    "p2": "It also works the other way: share a neutral link, and whoever opens it picks their own app.",
+    "p3": "Open, self-hosted, privacy-first. New map apps can be added one at a time."
+  },
+  "footer": {
+    "madeBy": "Self-hosted · open · privacy-first"
+  }
+}

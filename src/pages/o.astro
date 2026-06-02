@@ -1,0 +1,37 @@
+---
+export const prerender = false;
+import { isLocale, DEFAULT_LOCALE, type Locale, t } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import OpenHandler from '@/islands/OpenHandler';
+import { decodeShareParams } from '@/lib/share/encode';
+
+// Decode the place from the URL on the server — nothing is stored or logged.
+const match = decodeShareParams(Astro.url.searchParams);
+const langParam = Astro.url.searchParams.get('lang') ?? undefined;
+const locale: Locale = isLocale(langParam) ? langParam : DEFAULT_LOCALE;
+
+const strings = {
+  openingIn: t(locale, 'open.openingIn'),
+  openNow: t(locale, 'open.openNow'),
+  chooseDifferent: t(locale, 'open.chooseDifferent'),
+  noLocation: t(locale, 'open.noLocation'),
+  chooser: {
+    openIn: t(locale, 'chooser.openIn'),
+    remember: t(locale, 'chooser.remember'),
+    unavailable: t(locale, 'chooser.unavailable'),
+  },
+  manager: {
+    defaultLabel: t(locale, 'manager.defaultLabel'),
+    none: t(locale, 'manager.none'),
+    change: t(locale, 'manager.change'),
+    reset: t(locale, 'manager.reset'),
+    autoOpen: t(locale, 'manager.autoOpen'),
+  },
+};
+---
+
+<BaseLayout locale={locale} title="Open">
+  <section class="flex flex-col gap-4">
+    <OpenHandler client:load match={match} strings={strings} />
+  </section>
+</BaseLayout>

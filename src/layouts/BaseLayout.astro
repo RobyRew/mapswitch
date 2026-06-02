@@ -1,0 +1,67 @@
+---
+import '@/styles/global.css';
+import { type Locale, DEFAULT_LOCALE, alternateLinks, t, path } from '@/i18n/utils';
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  description?: string;
+}
+
+const { locale, title, description } = Astro.props;
+const pageTitle = title ? `${title} · ${t(locale, 'site.name')}` : t(locale, 'site.name');
+const desc = description ?? t(locale, 'site.tagline');
+const alts = alternateLinks(Astro.url.pathname);
+
+const umamiSrc = import.meta.env.PUBLIC_UMAMI_SCRIPT_URL;
+const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="color-scheme" content="light dark" />
+    {alts.map((a) => <link rel="alternate" hreflang={a.locale} href={a.href} />)}
+    <link rel="alternate" hreflang="x-default" href={`/${DEFAULT_LOCALE}`} />
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('mapswitch.theme');
+          var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
+    {umamiSrc && umamiId && <script is:inline defer src={umamiSrc} data-website-id={umamiId}></script>}
+  </head>
+  <body class="min-h-dvh flex flex-col">
+    <header class="border-b border-border">
+      <div class="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
+        <a href={path(locale)} class="text-base font-semibold text-text">🗺️ {t(locale, 'site.name')}</a>
+        <nav class="flex items-center gap-4 text-sm text-text-2">
+          <a href={path(locale, 'share')} class="hover:text-accent">{t(locale, 'nav.share')}</a>
+          <a href={path(locale, 'settings')} class="hover:text-accent">{t(locale, 'nav.settings')}</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto w-full max-w-2xl flex-1 px-4 py-8">
+      <slot />
+    </main>
+
+    <footer class="border-t border-border">
+      <div class="mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-text-3">
+        <div class="flex gap-4">
+          <a href={path(locale, 'privacy')} class="hover:text-accent">{t(locale, 'nav.privacy')}</a>
+          <a href={path(locale, 'about')} class="hover:text-accent">{t(locale, 'nav.about')}</a>
+        </div>
+        <span>{t(locale, 'footer.madeBy')}</span>
+      </div>
+    </footer>
+  </body>
+</html>

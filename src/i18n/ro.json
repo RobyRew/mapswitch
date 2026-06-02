@@ -1,0 +1,22 @@
+{
+  "site": {
+    "name": "MapSwitch",
+    "tagline": "Deschide orice locație în aplicația de hărți pe care o preferi."
+  },
+  "nav": {
+    "home": "Acasă",
+    "share": "Partajează un loc",
+    "settings": "Setări",
+    "privacy": "Confidențialitate",
+    "about": "Despre"
+  },
+  "home": {
+    "title": "Deschide orice link de hărți în aplicația ta",
+    "subtitle": "Lipește un link Google, Apple, Waze sau Yandex — sau coordonate, sau un Plus Code — și alege aplicația dorită."
+  },
+  "chooser": {
+    "openIn": "Deschide în…",
+    "remember": "Reține alegerea mea",
+    "unavailable": "Nu pe acest dispozitiv"
+  }
+}
