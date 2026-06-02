@@ -8,7 +8,8 @@
     "share": "Share a place",
     "settings": "Settings",
     "privacy": "Privacy",
-    "about": "About"
+    "about": "About",
+    "account": "Account"
   },
   "home": {
     "title": "Open any map link in your app",
@@ -73,5 +74,43 @@
   },
   "footer": {
     "madeBy": "Self-hosted · open · privacy-first"
+  },
+  "account": {
+    "loginTitle": "Sign in",
+    "signupTitle": "Create account",
+    "forgotTitle": "Reset your password",
+    "resetTitle": "Choose a new password",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "newPassword": "New password",
+    "passkey": "Sign in with a passkey",
+    "passkeyHint": "Fastest and most secure — no password needed.",
+    "or": "or",
+    "continueWith": "Continue with {{provider}}",
+    "signInBtn": "Sign in",
+    "signUpBtn": "Create account",
+    "sendReset": "Send reset link",
+    "setPassword": "Set new password",
+    "forgotLink": "Forgot your password?",
+    "noAccount": "No account? Create one",
+    "haveAccount": "Already have an account? Sign in",
+    "checkEmail": "Almost there — check your email to verify your address.",
+    "resetSent": "If that email exists, a reset link is on its way.",
+    "resetDone": "Password updated. You can sign in now.",
+    "genericError": "Something went wrong. Please try again.",
+    "signedInAs": "Signed in as",
+    "registerPasskey": "Add a passkey",
+    "passkeyAdded": "Passkey added.",
+    "signOut": "Sign out",
+    "myAccount": "Your account",
+    "history": "Recent links",
+    "historyEmpty": "No saved links yet.",
+    "saveShorten": "Save & shorten",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "delete": "Delete",
+    "yourShortLink": "Your short link",
+    "loginRequired": "Sign in to save short links and see your history."
   }
 }

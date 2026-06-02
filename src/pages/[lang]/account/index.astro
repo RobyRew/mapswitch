@@ -1,0 +1,37 @@
+---
+export const prerender = false;
+import { isLocale, type Locale, t, path } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AccountPanel from '@/islands/AccountPanel';
+import DefaultAppManager from '@/islands/DefaultAppManager';
+import { getUser } from '@/lib/auth/session';
+
+const { lang } = Astro.params;
+const locale: Locale = isLocale(lang) ? lang : 'en';
+
+const user = await getUser(Astro.request);
+if (!user) return Astro.redirect(path(locale, 'account/login'), 302);
+
+const accountStrings = {
+  signedInAs: t(locale, 'account.signedInAs'),
+  registerPasskey: t(locale, 'account.registerPasskey'),
+  passkeyAdded: t(locale, 'account.passkeyAdded'),
+  signOut: t(locale, 'account.signOut'),
+  genericError: t(locale, 'account.genericError'),
+};
+const managerStrings = {
+  defaultLabel: t(locale, 'manager.defaultLabel'),
+  none: t(locale, 'manager.none'),
+  change: t(locale, 'manager.change'),
+  reset: t(locale, 'manager.reset'),
+  autoOpen: t(locale, 'manager.autoOpen'),
+};
+---
+
+<BaseLayout locale={locale} title={t(locale, 'account.myAccount')}>
+  <section class="flex flex-col gap-6">
+    <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'account.myAccount')}</h1>
+    <AccountPanel client:load email={user.email} strings={accountStrings} loginPath={path(locale, 'account/login')} />
+    <DefaultAppManager client:load strings={managerStrings} />
+  </section>
+</BaseLayout>

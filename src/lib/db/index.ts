@@ -1,23 +1,16 @@
 import type { Store } from './store';
+import { createDrizzleStore } from './drizzleStore';
 
 let cached: Store | null | undefined;
 
 /**
- * The persistence seam. Returns null when no DB is configured (the default
- * today) — callers MUST handle null and fall back to client-side localStorage.
- *
- * Turning on accounts later means only this function changes: read DB_URL,
- * build a Drizzle+SQLite Store, and return it. No caller has to be rewritten.
+ * The persistence seam. Returns a Drizzle+SQLite store when DB_URL is set,
+ * else null (callers must handle null → feature unavailable). Anonymous flows
+ * never call this; only the authenticated preferences/links/history APIs do.
  */
 export function getStore(): Store | null {
   if (cached !== undefined) return cached;
-  const dbUrl = process.env.DB_URL;
-  if (!dbUrl) {
-    cached = null;
-    return cached;
-  }
-  // Future: cached = createSqliteStore(dbUrl);
-  cached = null;
+  cached = process.env.DB_URL ? createDrizzleStore() : null;
   return cached;
 }
 

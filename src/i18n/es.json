@@ -8,7 +8,8 @@
     "share": "Compartir un lugar",
     "settings": "Ajustes",
     "privacy": "Privacidad",
-    "about": "Acerca de"
+    "about": "Acerca de",
+    "account": "Cuenta"
   },
   "home": {
     "title": "Abre cualquier enlace de mapas en tu app",
@@ -73,5 +74,43 @@
   },
   "footer": {
     "madeBy": "Autoalojado · abierto · privacidad primero"
+  },
+  "account": {
+    "loginTitle": "Iniciar sesión",
+    "signupTitle": "Crear cuenta",
+    "forgotTitle": "Restablecer contraseña",
+    "resetTitle": "Elige una nueva contraseña",
+    "email": "Correo",
+    "password": "Contraseña",
+    "name": "Nombre",
+    "newPassword": "Nueva contraseña",
+    "passkey": "Entrar con un passkey",
+    "passkeyHint": "Lo más rápido y seguro — sin contraseña.",
+    "or": "o",
+    "continueWith": "Continuar con {{provider}}",
+    "signInBtn": "Entrar",
+    "signUpBtn": "Crear cuenta",
+    "sendReset": "Enviar enlace",
+    "setPassword": "Guardar contraseña",
+    "forgotLink": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿Sin cuenta? Crea una",
+    "haveAccount": "¿Ya tienes cuenta? Entra",
+    "checkEmail": "Casi listo — revisa tu correo para verificar tu dirección.",
+    "resetSent": "Si ese correo existe, te enviamos un enlace.",
+    "resetDone": "Contraseña actualizada. Ya puedes entrar.",
+    "genericError": "Algo salió mal. Inténtalo de nuevo.",
+    "signedInAs": "Sesión iniciada como",
+    "registerPasskey": "Añadir un passkey",
+    "passkeyAdded": "Passkey añadido.",
+    "signOut": "Cerrar sesión",
+    "myAccount": "Tu cuenta",
+    "history": "Enlaces recientes",
+    "historyEmpty": "Aún no hay enlaces guardados.",
+    "saveShorten": "Guardar y acortar",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "delete": "Eliminar",
+    "yourShortLink": "Tu enlace corto",
+    "loginRequired": "Inicia sesión para guardar enlaces cortos y ver tu historial."
   }
 }

@@ -11,8 +11,7 @@ node_modules/
 !.env.example
 
 # data (future SQLite volume)
-data/*.sqlite
-data/*.sqlite-*
+data/
 
 # misc
 *.log
