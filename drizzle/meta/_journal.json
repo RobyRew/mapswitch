@@ -15,6 +15,13 @@
       "when": 1780518254014,
       "tag": "0001_nifty_joshua_kane",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1780519170928,
+      "tag": "0002_medical_taskmaster",
+      "breakpoints": true
     }
   ]
 }

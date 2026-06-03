@@ -11,6 +11,11 @@ export const user = sqliteTable('user', {
   image: text('image'),
   createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
+  // admin plugin
+  role: text('role').default('user'),
+  banned: integer('banned', { mode: 'boolean' }).default(false),
+  banReason: text('banReason'),
+  banExpires: integer('banExpires', { mode: 'timestamp' }),
 });
 
 export const session = sqliteTable('session', {
@@ -21,6 +26,7 @@ export const session = sqliteTable('session', {
   updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
   ipAddress: text('ipAddress'),
   userAgent: text('userAgent'),
+  impersonatedBy: text('impersonatedBy'), // admin plugin
   userId: text('userId')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),

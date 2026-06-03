@@ -1,10 +1,12 @@
 import 'dotenv/config';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { admin } from 'better-auth/plugins';
 import { passkey } from '@better-auth/passkey';
 import { getDb } from '@/lib/db/client';
 import * as schema from '@/lib/db/schema';
 import { sendVerificationEmail, sendResetPasswordEmail } from './email';
+import { seedAdmin } from './seed';
 
 const ORIGIN = process.env.PUBLIC_SITE_URL || 'https://maps.robyrew.com';
 const RP_ID = new URL(ORIGIN).hostname; // passkey relying-party id (no scheme/port)
@@ -56,7 +58,7 @@ function buildAuth() {
       },
     },
     socialProviders: socialProviders(),
-    plugins: [passkey({ rpID: RP_ID, rpName: 'MapSwitch', origin: ORIGIN })],
+    plugins: [passkey({ rpID: RP_ID, rpName: 'MapSwitch', origin: ORIGIN }), admin()],
     rateLimit: {
       enabled: true,
       storage: 'database',
@@ -81,11 +83,14 @@ let cached: ReturnType<typeof buildAuth> | null = null;
 /**
  * Lazily build the better-auth instance. Lazy on purpose: it opens the SQLite DB
  * (getDb), so we must NOT touch it at build time — only at runtime, when a route
- * actually needs auth. The catch-all route and on-demand account pages/APIs call
- * this; nothing prerendered does.
+ * actually needs auth. On first build we also seed the admin user (idempotent,
+ * fire-and-forget).
  */
 export function getAuth(): ReturnType<typeof buildAuth> {
-  cached ??= buildAuth();
+  if (!cached) {
+    cached = buildAuth();
+    void seedAdmin(cached);
+  }
   return cached;
 }
 
