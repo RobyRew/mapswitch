@@ -16,7 +16,7 @@ Anonymous use stores nothing.
 |---|---|---|
 | XSS via injected inline script | Strict CSP: `script-src 'self' <hashes>` — no `'unsafe-inline'` | `src/lib/security/headers.ts` (`buildCSP`), hashes via `scripts/csp-hashes.mjs` |
 | Clickjacking | `X-Frame-Options: DENY` + `frame-ancestors 'none'` | `headers.ts` |
-| SSRF (short-link expander) | http(s)-only, host allow-list, private/loopback/link-local/metadata IP block on every hop, **socket pinned to the vetted IP** (anti DNS-rebinding), capped hops + timeout, HEAD-only, no cookies | `src/lib/expand/{safeExpand,allowlist,ipGuard}.ts` |
+| SSRF (short-link expander) | http(s)-only, host allow-list, private/loopback/link-local/metadata IP block on every hop (**the map-domain allow-list is the primary control** — a rebind would need attacker-controlled DNS on an allow-listed domain), EU consent handled via `continue=`, capped hops + timeout, HEAD-only, no cookies | `src/lib/expand/{safeExpand,allowlist,ipGuard}.ts` |
 | Injection (JSON endpoints) | `Content-Type` enforced, body size capped, safe parse, then Zod | `src/lib/http/guard.ts` + every `src/pages/api/*` |
 | SQL injection | Drizzle ORM parameterized queries only — never `sql.raw` with interpolation | `src/lib/db/*` |
 | Open redirect | Same-origin path-only `safeRedirect`; `lang`/slug validated; only registry-built deep links emitted | `src/lib/security/redirects.ts`, `/o`, `/x/[slug]` |

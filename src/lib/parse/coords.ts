@@ -27,7 +27,8 @@ export function roundCoord(n: number): number {
 
 /** Parse a "lat,lng" string (optional surrounding spaces). null if invalid. */
 export function parseLatLngPair(input: string): LatLng | null {
-  const m = input.trim().match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+  // Tolerate optional wrapping parentheses, e.g. "(41.22, 1.15)".
+  const m = input.trim().match(/^\(?\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)?$/);
   if (!m) return null;
   const lat = Number(m[1]);
   const lng = Number(m[2]);

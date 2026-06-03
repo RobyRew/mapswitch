@@ -69,6 +69,23 @@ export const google: Provider = {
       }
     }
 
+    // 4. Fallback: coordinates anywhere in the decoded path/search — covers
+    //    expanded short links like /maps/search/41.225531,+1.148071.
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(url.pathname + url.search).replace(/\+/g, ' ');
+    } catch {
+      decoded = (url.pathname + url.search).replace(/\+/g, ' ');
+    }
+    const g = decoded.match(/(-?\d{1,3}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/);
+    if (g) {
+      const lat = Number(g[1]);
+      const lng = Number(g[2]);
+      if (isValidLatLng(lat, lng)) {
+        return { lat: roundCoord(lat), lng: roundCoord(lng), label: placeLabel(url), source: 'google' };
+      }
+    }
+
     return null;
   },
 

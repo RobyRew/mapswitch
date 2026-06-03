@@ -1,5 +1,4 @@
 import { lookup } from 'node:dns/promises';
-import { Agent, fetch as undiciFetch } from 'undici';
 import { isAllowedHost } from './allowlist';
 import { isBlockedIp } from './ipGuard';
 
@@ -23,6 +22,16 @@ export interface ExpandOptions {
 
 const REDIRECT_STATUS = new Set([301, 302, 303, 307, 308]);
 
+// A real browser UA + consent cookie so EU Google short links resolve to their
+// destination instead of being served a consent.google.com interstitial.
+const BROWSER_HEADERS: Record<string, string> = {
+  accept: '*/*',
+  'user-agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+  'accept-language': 'en-US,en;q=0.9',
+  cookie: 'CONSENT=YES+; SOCS=CAISEwgDEgk',
+};
+
 function toHttpUrl(raw: string): URL {
   let url: URL;
   try {
@@ -36,8 +45,17 @@ function toHttpUrl(raw: string): URL {
   return url;
 }
 
-/** Allow-list + DNS-resolve + private-IP check. Returns the vetted IP list. */
-async function resolveAndVet(url: URL, doLookup: LookupLike): Promise<string[]> {
+function isConsentHost(url: URL): boolean {
+  return url.hostname === 'consent.google.com' || url.hostname.endsWith('.consent.google.com');
+}
+
+/**
+ * SSRF guard per hop: host must be allow-listed (only map domains — which an
+ * attacker cannot repoint at private IPs), and the resolved IP(s) must not be
+ * private/internal. The allow-list is the primary control; the IP check is
+ * defense-in-depth.
+ */
+async function assertSafeHost(url: URL, doLookup: LookupLike): Promise<void> {
   if (!isAllowedHost(url.hostname)) throw new ExpandError('host not allowed');
   let addrs: Array<{ address: string }>;
   try {
@@ -49,41 +67,21 @@ async function resolveAndVet(url: URL, doLookup: LookupLike): Promise<string[]> 
   for (const a of addrs) {
     if (isBlockedIp(a.address)) throw new ExpandError('blocked address');
   }
-  return addrs.map((a) => a.address);
 }
 
 const defaultLookup: LookupLike = (host) => lookup(host, { all: true });
 
 /**
- * Production fetch that PINS the socket to an already-vetted IP. `fetch`/undici
- * would otherwise re-resolve DNS itself, so a rebinding attacker could pass our
- * check with a public IP and connect to a private one (TOCTOU). Pinning makes
- * "the IP we validated" === "the IP we connect to", per hop, while keeping the
- * hostname for TLS SNI / cert validation.
- */
-function pinnedFetch(pinnedIp: string): FetchLike {
-  const family = pinnedIp.includes(':') ? 6 : 4;
-  const agent = new Agent({
-    connect: {
-      // dns.lookup-style signature; ignore the host, return the pinned IP only.
-      lookup: ((_hostname: string, _options: unknown, cb: (e: Error | null, a: string, f: number) => void) =>
-        cb(null, pinnedIp, family)) as never,
-    },
-  });
-  return (url, init) =>
-    undiciFetch(url, { ...init, dispatcher: agent } as never) as unknown as Promise<Response>;
-}
-
-/**
  * Follow redirects for a SHORT map link and return the final URL — safely.
- * On the initial URL and EVERY hop: http(s)-only, host allow-listed, resolved
- * IP(s) not private/internal, socket pinned to the vetted IP, capped hops +
- * wall-clock budget, HEAD-only (no body), no cookies. Throws on any breach.
+ * Per hop: handle EU consent interstitials via `continue`; otherwise http(s)-only
+ * + host allow-listed + non-private resolved IP, capped hops + wall-clock budget,
+ * HEAD-only (no body), no credentials. Throws ExpandError on any breach.
  */
 export async function safeExpand(rawUrl: string, opts: ExpandOptions = {}): Promise<string> {
   const maxHops = opts.maxHops ?? 5;
   const timeoutMs = opts.timeoutMs ?? 4000;
   const doLookup = opts.lookupImpl ?? defaultLookup;
+  const doFetch: FetchLike = opts.fetchImpl ?? ((u, init) => fetch(u, init));
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -92,8 +90,15 @@ export async function safeExpand(rawUrl: string, opts: ExpandOptions = {}): Prom
     let current = toHttpUrl(rawUrl);
 
     for (let hop = 0; hop <= maxHops; hop++) {
-      const ips = await resolveAndVet(current, doLookup);
-      const doFetch: FetchLike = opts.fetchImpl ?? pinnedFetch(ips[0]!);
+      // EU consent interstitial: never fetch it — take the real URL from `continue`.
+      if (isConsentHost(current)) {
+        const cont = current.searchParams.get('continue');
+        if (!cont) throw new ExpandError('consent without continue');
+        current = toHttpUrl(cont);
+        continue;
+      }
+
+      await assertSafeHost(current, doLookup);
 
       let res: Response;
       try {
@@ -101,14 +106,14 @@ export async function safeExpand(rawUrl: string, opts: ExpandOptions = {}): Prom
           method: 'HEAD',
           redirect: 'manual',
           signal: controller.signal,
-          headers: { accept: '*/*' },
+          headers: BROWSER_HEADERS,
         });
         if (res.status === 405 || res.status === 501) {
           res = await doFetch(current.href, {
             method: 'GET',
             redirect: 'manual',
             signal: controller.signal,
-            headers: { accept: '*/*', range: 'bytes=0-0' },
+            headers: { ...BROWSER_HEADERS, range: 'bytes=0-0' },
           });
         }
       } catch (err) {

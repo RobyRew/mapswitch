@@ -8,6 +8,13 @@
       "when": 1780391129540,
       "tag": "0000_wealthy_butterfly",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1780518254014,
+      "tag": "0001_nifty_joshua_kane",
+      "breakpoints": true
     }
   ]
 }

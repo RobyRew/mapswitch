@@ -109,3 +109,13 @@ export const linkHistory = sqliteTable(
   },
   (t) => [index('link_history_user_idx').on(t.userId, t.openedAt)],
 );
+
+// ── better-auth database rate limiter ───────────────────────────────────────
+// Required when auth.ts sets rateLimit.storage = 'database'. better-auth reads/
+// writes `key`, `count`, and `lastRequest` (a raw Date.now() millisecond number).
+export const rateLimit = sqliteTable('rateLimit', {
+  id: text('id').primaryKey(),
+  key: text('key'),
+  count: integer('count'),
+  lastRequest: integer('lastRequest'),
+});
