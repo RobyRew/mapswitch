@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { authClient } from '@/lib/auth/client';
+import { claimAnonLinks } from './hooks/useAnonId';
 
 type Mode = 'login' | 'signup' | 'forgot' | 'reset';
 type Provider = 'google' | 'github' | 'apple';
@@ -83,6 +84,7 @@ export default function AuthForm({
     void run(async () => {
       const { error: e } = await authClient.signIn.passkey();
       if (e) return setError(strings.genericError);
+      await claimAnonLinks();
       window.location.href = redirectTo;
     });
   }
@@ -97,6 +99,7 @@ export default function AuthForm({
       if (mode === 'login') {
         const { error: err } = await authClient.signIn.email({ email, password });
         if (err) return setError(strings.genericError);
+        await claimAnonLinks();
         window.location.href = redirectTo;
       } else if (mode === 'signup') {
         const { error: err } = await authClient.signUp.email({ name, email, password });

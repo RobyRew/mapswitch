@@ -90,9 +90,9 @@ export const savedLinks = sqliteTable(
   'saved_links',
   {
     slug: text('slug').primaryKey(),
-    userId: text('userId')
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
+    userId: text('userId').references(() => user.id, { onDelete: 'cascade' }), // null = anonymous
+    ownerToken: text('ownerToken'), // anonymous owner (localStorage id) — quota + claim
+    ipHash: text('ipHash'), // salted hash of creator IP (anon quota)
     lat: real('lat').notNull(),
     lng: real('lng').notNull(),
     label: text('label'),
@@ -100,7 +100,11 @@ export const savedLinks = sqliteTable(
     expiresAt: integer('expiresAt', { mode: 'timestamp' }),
     hitCount: integer('hitCount').notNull().default(0),
   },
-  (t) => [index('saved_links_user_idx').on(t.userId)],
+  (t) => [
+    index('saved_links_user_idx').on(t.userId),
+    index('saved_links_owner_idx').on(t.ownerToken),
+    index('saved_links_iphash_idx').on(t.ipHash),
+  ],
 );
 
 export const linkHistory = sqliteTable(

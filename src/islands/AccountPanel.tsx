@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { authClient } from '@/lib/auth/client';
+import { claimAnonLinks } from './hooks/useAnonId';
 
 export interface AccountStrings {
   signedInAs: string;
@@ -18,6 +19,11 @@ interface Props {
 export default function AccountPanel({ email, strings, loginPath }: Props) {
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // Claim anonymous links created in this browser before signing in.
+  useEffect(() => {
+    void claimAnonLinks();
+  }, []);
 
   async function addPasskey() {
     setBusy(true);

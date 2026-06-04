@@ -62,7 +62,7 @@
   "privacy": {
     "title": "Privacidad",
     "anonymousTitle": "Uso anónimo",
-    "anonymousBody": "Sin cuenta, MapSwitch no guarda nada sobre ti. Los enlaces para compartir llevan el lugar en la propia URL: no hay base de datos de dónde has estado. Tu app preferida se guarda solo en este navegador (localStorage), sin cookies de seguimiento. Cuando hay que expandir un enlace corto (como maps.app.goo.gl), se resuelve en el servidor contra una lista estricta de dominios de mapas, y las coordenadas nunca se registran ni se comunican a ningún sitio.",
+    "anonymousBody": "Sin cuenta, lo único que MapSwitch guarda son los enlaces cortos que creas — y esos se borran solos a los 7 días (máx. 20 por semana). Abrir o convertir enlaces no guarda nada; los enlaces neutros /o llevan el lugar en la propia URL; y tu app preferida se queda solo en este navegador (localStorage), sin cookies de seguimiento. Los enlaces cortos como maps.app.goo.gl se expanden en el servidor contra una lista estricta de dominios de mapas, y las coordenadas nunca se registran.",
     "accountTitle": "Con una cuenta",
     "accountBody": "Si inicias sesión, guardamos tu correo, una contraseña cifrada y/o tus identificadores de OAuth y passkey, tus enlaces cortos guardados (con sus coordenadas y etiqueta) y tu app preferida — en una base de datos SQLite autoalojada con copias de seguridad cifradas. Al eliminar tu cuenta se borra todo. Las cookies de sesión son httpOnly, Secure y SameSite=Lax. Seguimos sin registrar coordenadas y sin rastreadores de terceros."
   },
@@ -111,6 +111,16 @@
     "copied": "¡Copiado!",
     "delete": "Eliminar",
     "yourShortLink": "Tu enlace corto",
-    "loginRequired": "Inicia sesión para guardar enlaces cortos y ver tu historial."
+    "loginRequired": "Inicia sesión para guardar enlaces cortos y ver tu historial.",
+    "expiryLabel": "Caduca:",
+    "expiryIndefinite": "Nunca (permanente)",
+    "expiry7d": "En 7 días",
+    "expiry30d": "En 30 días",
+    "expiry1y": "En 1 año",
+    "anonNote": "Los enlaces anónimos caducan a los 7 días (máx. 20 por semana). Inicia sesión para conservarlos.",
+    "weeklyLimit": "Límite semanal alcanzado (20 enlaces anónimos por 7 días). Inicia sesión para más.",
+    "accountLimit": "Has alcanzado 1000 enlaces guardados — contáctame para ampliarlo.",
+    "permanent": "permanente",
+    "expires": "caduca"
   }
 }

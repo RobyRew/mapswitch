@@ -1,6 +1,6 @@
 ---
 export const prerender = true;
-import { LOCALES, isLocale, type Locale, t, path } from '@/i18n/utils';
+import { LOCALES, isLocale, type Locale, t } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ShareLinkGenerator from '@/islands/ShareLinkGenerator';
 
@@ -24,8 +24,15 @@ const strings = {
   yourLink: t(locale, 'share.yourLink'),
   saveShorten: t(locale, 'account.saveShorten'),
   yourShortLink: t(locale, 'account.yourShortLink'),
-  loginRequired: t(locale, 'account.loginRequired'),
-  signIn: t(locale, 'account.loginTitle'),
+  expiryLabel: t(locale, 'account.expiryLabel'),
+  expiryIndefinite: t(locale, 'account.expiryIndefinite'),
+  expiry7d: t(locale, 'account.expiry7d'),
+  expiry30d: t(locale, 'account.expiry30d'),
+  expiry1y: t(locale, 'account.expiry1y'),
+  anonNote: t(locale, 'account.anonNote'),
+  weeklyLimit: t(locale, 'account.weeklyLimit'),
+  accountLimit: t(locale, 'account.accountLimit'),
+  error: t(locale, 'account.genericError'),
 };
 ---
 
@@ -35,6 +42,6 @@ const strings = {
       <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'share.title')}</h1>
       <p class="text-text-2">{t(locale, 'share.subtitle')}</p>
     </div>
-    <ShareLinkGenerator client:load baseUrl={base} loginPath={path(locale, 'account/login')} strings={strings} />
+    <ShareLinkGenerator client:load baseUrl={base} strings={strings} />
   </section>
 </BaseLayout>

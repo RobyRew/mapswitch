@@ -62,7 +62,7 @@
   "privacy": {
     "title": "Privacy",
     "anonymousTitle": "Anonymous use",
-    "anonymousBody": "Without an account, MapSwitch stores nothing about you. Share links carry the place in the URL itself — there is no database of where you've been. Your preferred app is saved only in this browser (localStorage), with no tracking cookies. When a shortened link (like maps.app.goo.gl) needs expanding, it's resolved on the server against a strict allow-list of map domains, and the coordinates are never logged or reported anywhere.",
+    "anonymousBody": "Without an account, the only thing MapSwitch stores is the short links you create — and those auto-delete after 7 days (up to 20 per week). Opening or converting links stores nothing; neutral /o share links carry the place in the URL itself; and your preferred app stays only in this browser (localStorage), with no tracking cookies. Short links like maps.app.goo.gl are expanded server-side against a strict allow-list of map domains, and coordinates are never logged.",
     "accountTitle": "With an account",
     "accountBody": "If you sign in, we store your email, a hashed password and/or your OAuth and passkey identifiers, your saved short links (with their coordinates and label), and your app preference — in a self-hosted SQLite database with encrypted off-site backups. Deleting your account removes all of it. Session cookies are httpOnly, Secure and SameSite=Lax. We still never log coordinates and use no third-party trackers."
   },
@@ -111,6 +111,16 @@
     "copied": "Copied!",
     "delete": "Delete",
     "yourShortLink": "Your short link",
-    "loginRequired": "Sign in to save short links and see your history."
+    "loginRequired": "Sign in to save short links and see your history.",
+    "expiryLabel": "Expires:",
+    "expiryIndefinite": "Never (permanent)",
+    "expiry7d": "In 7 days",
+    "expiry30d": "In 30 days",
+    "expiry1y": "In 1 year",
+    "anonNote": "Anonymous short links expire after 7 days (max 20 per week). Sign in to keep them.",
+    "weeklyLimit": "Weekly limit reached (20 anonymous links per 7 days). Sign in for more.",
+    "accountLimit": "You've reached 1000 saved links — please contact me to raise the limit.",
+    "permanent": "permanent",
+    "expires": "expires"
   }
 }

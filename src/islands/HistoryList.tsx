@@ -6,6 +6,8 @@ export interface HistoryStrings {
   copy: string;
   copied: string;
   delete: string;
+  permanent: string;
+  expires: string;
 }
 
 interface Item {
@@ -14,6 +16,7 @@ interface Item {
   lat: number;
   lng: number;
   createdAt: number;
+  expiresAt: number | null;
   hitCount: number;
 }
 
@@ -66,7 +69,10 @@ export default function HistoryList({ strings, baseUrl }: { strings: HistoryStri
                   {it.label || `${it.lat}, ${it.lng}`}
                 </div>
                 <div className="truncate text-xs text-text-3">
-                  /x/{it.slug} · {it.hitCount}×
+                  /x/{it.slug} · {it.hitCount}× ·{' '}
+                  {it.expiresAt
+                    ? `${strings.expires} ${new Date(it.expiresAt).toLocaleDateString()}`
+                    : strings.permanent}
                 </div>
               </div>
               <div className="flex shrink-0 gap-2">
