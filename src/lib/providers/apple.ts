@@ -9,6 +9,7 @@ export const apple: Provider = {
   // Apple Maps is meaningful on Apple platforms + the desktop web viewer.
   platforms: ['ios', 'web'],
   hosts: ['maps.apple.com'],
+  shortLinkHosts: ['maps.apple', 'apple.co'], // maps.apple/p/… and apple.co short links
 
   parse(url) {
     if (!hostMatches(url, ['maps.apple.com'])) return null;
@@ -19,7 +20,7 @@ export const apple: Provider = {
     const q = url.searchParams.get('q');
     const pair = (ll ? parseLatLngPair(ll) : null) ?? (q ? parseLatLngPair(q) : null);
     if (!pair) return null;
-    const label = q && !parseLatLngPair(q) ? q : undefined;
+    const label = (q && !parseLatLngPair(q) ? q : null) ?? url.searchParams.get('name') ?? undefined;
     return { ...pair, label, source: 'apple' };
   },
 

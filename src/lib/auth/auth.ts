@@ -8,9 +8,36 @@ import * as schema from '@/lib/db/schema';
 import { sendVerificationEmail, sendResetPasswordEmail } from './email';
 import { seedAdmin } from './seed';
 
-const ORIGIN = process.env.PUBLIC_SITE_URL || 'https://maps.robyrew.com';
+function resolveOrigin(): string {
+  const raw = (process.env.BETTER_AUTH_URL || process.env.PUBLIC_SITE_URL || 'https://maps.robyrew.com').trim();
+  let u: URL;
+  try {
+    u = new URL(raw);
+  } catch {
+    try {
+      u = new URL('https://' + raw.replace(/^https?:\/\//, ''));
+    } catch {
+      return 'https://maps.robyrew.com';
+    }
+  }
+  // Force https for non-local hosts — Traefik terminates TLS; OAuth + passkeys need it.
+  if (u.hostname !== 'localhost' && u.hostname !== '127.0.0.1' && u.protocol !== 'https:') {
+    u.protocol = 'https:';
+  }
+  return u.origin; // strips path / trailing slash, normalises host
+}
+
+const ORIGIN = resolveOrigin();
 const RP_ID = new URL(ORIGIN).hostname; // passkey relying-party id (no scheme/port)
 const SECURE = ORIGIN.startsWith('https'); // dev on http://localhost can't use Secure cookies
+
+// Always trust the production domain + local dev, so a misconfigured
+// PUBLIC_SITE_URL (wrong scheme / trailing slash / unset) can't break login.
+const TRUSTED_ORIGINS = Array.from(
+  new Set([ORIGIN, 'https://maps.robyrew.com', 'http://localhost:5176', 'https://appleid.apple.com']),
+);
+
+console.log('[auth] resolved origin:', ORIGIN);
 
 type BetterAuthOptions = Parameters<typeof betterAuth>[0];
 
@@ -38,7 +65,7 @@ function buildAuth() {
     baseURL: ORIGIN,
     secret: process.env.BETTER_AUTH_SECRET,
     database: drizzleAdapter(getDb(), { provider: 'sqlite', schema }),
-    trustedOrigins: [ORIGIN, 'https://appleid.apple.com'],
+    trustedOrigins: TRUSTED_ORIGINS,
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,

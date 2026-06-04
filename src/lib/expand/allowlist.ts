@@ -10,6 +10,7 @@ export const ALLOWED_HOSTS: readonly string[] = [
   'maps.google.com',
   // Apple
   'apple.co',
+  'maps.apple',
   'maps.apple.com',
   // Waze
   'waze.com',

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { parsePure, isExpandable } from '@/lib/parse/pipeline';
+import { parsePure } from '@/lib/parse/pipeline';
 import type { Match } from '@/lib/providers/types';
 import { usePlatform } from './hooks/usePlatform';
 import AppChooser, { type ChooserStrings } from './AppChooser';
@@ -26,32 +26,30 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
     const trimmed = input.trim();
     if (!trimmed) return;
 
+    // Try locally first (zero network for links that already carry coordinates).
     const direct = parsePure(trimmed);
     if (direct) {
       setMatch(direct);
       return;
     }
 
-    if (isExpandable(trimmed)) {
-      setBusy(true);
-      try {
-        const res = await fetch('/api/resolve', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ input: trimmed }),
-        });
-        const data = (await res.json()) as { match?: Match; error?: string };
-        if (res.ok && data.match) setMatch(data.match);
-        else setError(strings.error);
-      } catch {
-        setError(strings.error);
-      } finally {
-        setBusy(false);
-      }
-      return;
+    // Otherwise let the server resolve it — short-link expansion, named-place
+    // geocoding, or a pasted address/place name.
+    setBusy(true);
+    try {
+      const res = await fetch('/api/resolve', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ input: trimmed }),
+      });
+      const data = (await res.json()) as { match?: Match; error?: string; message?: string };
+      if (res.ok && data.match) setMatch(data.match);
+      else setError(data.message || strings.error);
+    } catch {
+      setError(strings.error);
+    } finally {
+      setBusy(false);
     }
-
-    setError(strings.error);
   }
 
   async function pasteFromClipboard() {

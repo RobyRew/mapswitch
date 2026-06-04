@@ -3,6 +3,7 @@ import { parseWithRegistry, SHORT_LINK_HOSTS } from '../providers/registry';
 import { normalizeInput } from './normalize';
 import { parseLatLngPair } from './coords';
 import { decodePlusCode } from './pluscode';
+import { decodeShareParams } from '../share/encode';
 
 /**
  * Parse a raw input WITHOUT any network — safe to run in the browser.
@@ -21,7 +22,8 @@ export function parsePure(raw: string): Match | null {
       return pair ? { ...pair, source: 'pluscode' } : null;
     }
     case 'url':
-      return parseWithRegistry(n.url);
+      // Providers first; then our own /o?ll= share links (and any ?ll=lat,lng).
+      return parseWithRegistry(n.url) ?? decodeShareParams(n.url.searchParams);
     default:
       return null;
   }
