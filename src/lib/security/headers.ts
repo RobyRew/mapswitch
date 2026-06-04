@@ -35,6 +35,7 @@ export function buildCSP(): string {
     "font-src 'self' data:",
     `connect-src ${connect}`,
     "manifest-src 'self'",
+    "worker-src 'self'", // service worker (PWA) — same-origin only
     "object-src 'none'",
     "frame-ancestors 'none'",
     "base-uri 'self'",

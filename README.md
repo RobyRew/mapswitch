@@ -116,7 +116,25 @@ Callback URL pattern (production): `https://maps.robyrew.com/api/auth/callback/<
 
 Each provider only activates when its env vars are present, so you can add them one at a time.
 
+## Install (PWA) & sharing
+
+MapSwitch is an installable PWA (web app manifest + a minimal, privacy-preserving
+service worker — it caches only the static shell, never `/api/*` or your links).
+
+- **Android / desktop Chrome** — *Add to Home Screen / Install*. Once installed,
+  MapSwitch shows up in the system **Share sheet**: share a map link (or any text
+  with a link in it) from another app and it opens here and resolves automatically.
+  This uses the [Web Share Target API](https://developer.mozilla.org/docs/Web/Manifest/share_target)
+  → `GET /share-target`.
+- **iOS / Safari** — *Share → Add to Home Screen* for the app icon. iOS doesn't let
+  PWAs register as share targets, so to get MapSwitch into the share sheet make a
+  one-step **Shortcut**: *Shortcuts → ＋ → Receive “URLs” and “Text” from Share Sheet
+  → Open URL* `https://maps.robyrew.com/share-target?text=[Shortcut Input]`, then turn
+  on *Show in Share Sheet*. Sharing a link to it opens MapSwitch and resolves it.
+
+App icons are generated from `public/favicon.svg` with `npm run icons`.
+
 ## Roadmap
 
-More providers (Organic Maps, OsmAnd, HERE) · PWA + Android share-target / iOS
-share-extension · bookmarklet/extension.
+More providers (Organic Maps, OsmAnd, HERE) · native iOS share-extension app ·
+bookmarklet/extension.

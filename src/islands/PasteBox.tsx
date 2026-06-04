@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { parsePure } from '@/lib/parse/pipeline';
 import type { Match } from '@/lib/providers/types';
 import { usePlatform } from './hooks/usePlatform';
@@ -20,37 +20,52 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function resolve(input: string) {
-    setError(null);
-    setMatch(null);
-    const trimmed = input.trim();
-    if (!trimmed) return;
+  const resolve = useCallback(
+    async (input: string) => {
+      setError(null);
+      setMatch(null);
+      const trimmed = input.trim();
+      if (!trimmed) return;
 
-    // Try locally first (zero network for links that already carry coordinates).
-    const direct = parsePure(trimmed);
-    if (direct) {
-      setMatch(direct);
-      return;
-    }
+      // Try locally first (zero network for links that already carry coordinates).
+      const direct = parsePure(trimmed);
+      if (direct) {
+        setMatch(direct);
+        return;
+      }
 
-    // Otherwise let the server resolve it — short-link expansion, named-place
-    // geocoding, or a pasted address/place name.
-    setBusy(true);
-    try {
-      const res = await fetch('/api/resolve', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ input: trimmed }),
-      });
-      const data = (await res.json()) as { match?: Match; error?: string; message?: string };
-      if (res.ok && data.match) setMatch(data.match);
-      else setError(data.message || strings.error);
-    } catch {
-      setError(strings.error);
-    } finally {
-      setBusy(false);
-    }
-  }
+      // Otherwise let the server resolve it — short-link expansion, named-place
+      // geocoding, or a pasted address/place name.
+      setBusy(true);
+      try {
+        const res = await fetch('/api/resolve', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ input: trimmed }),
+        });
+        const data = (await res.json()) as { match?: Match; error?: string; message?: string };
+        if (res.ok && data.match) setMatch(data.match);
+        else setError(data.message || strings.error);
+      } catch {
+        setError(strings.error);
+      } finally {
+        setBusy(false);
+      }
+    },
+    [strings],
+  );
+
+  // Ingest a shared link once on mount: the Web Share Target (/share-target)
+  // redirects here with ?s=…; we also accept raw ?url=/?text=/?title= params.
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const shared = sp.get('s') ?? sp.get('url') ?? sp.get('text') ?? sp.get('title');
+    if (!shared) return;
+    setValue(shared);
+    void resolve(shared);
+    // Drop the params so a refresh/back doesn't re-resolve and the URL stays clean.
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+  }, [resolve]);
 
   async function pasteFromClipboard() {
     try {

@@ -1,0 +1,18 @@
+---
+// Static fallback shown by the service worker when a navigation fails offline.
+export const prerender = true;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout locale="en" title="Offline">
+  <section class="flex flex-col items-center gap-4 py-16 text-center">
+    <span class="text-4xl">📡</span>
+    <h1 class="text-2xl font-semibold text-text">You're offline</h1>
+    <p class="max-w-sm text-text-2">
+      MapSwitch needs a connection to expand and resolve map links. Reconnect and try again.
+    </p>
+    <a href="/" class="rounded-lg bg-accent px-4 py-2.5 font-medium text-accent-text hover:bg-accent-hover">
+      Retry
+    </a>
+  </section>
+</BaseLayout>

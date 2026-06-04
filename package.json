@@ -11,6 +11,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node ./scripts/migrate.mjs",
     "apple:secret": "node ./scripts/apple-secret.mjs",
+    "icons": "node ./scripts/gen-icons.mjs",
     "astro": "astro",
     "check": "astro check",
     "lint": "eslint .",

@@ -25,6 +25,14 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1c1e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="MapSwitch" />
     <meta name="color-scheme" content="light dark" />
     {alts.map((a) => <link rel="alternate" hreflang={a.locale} href={a.href} />)}
     <link rel="alternate" hreflang="x-default" href={`/${DEFAULT_LOCALE}`} />
@@ -37,6 +45,7 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
         } catch (e) {}
       })();
     </script>
+    <script is:inline src="/sw-register.js"></script>
     {umamiSrc && umamiId && <script is:inline defer src={umamiSrc} data-website-id={umamiId}></script>}
   </head>
   <body class="min-h-dvh flex flex-col">
