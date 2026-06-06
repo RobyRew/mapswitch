@@ -1,86 +1,34 @@
 import { sqliteTable, text, integer, real, index } from 'drizzle-orm/sqlite-core';
 
-// ── better-auth core tables ────────────────────────────────────────────────
-// Column names match better-auth's field names (camelCase). Verified against
-// better-auth / @better-auth/passkey schema definitions.
-export const user = sqliteTable('user', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  email: text('email').notNull().unique(),
-  emailVerified: integer('emailVerified', { mode: 'boolean' }).notNull().default(false),
-  image: text('image'),
-  createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
-  // admin plugin
-  role: text('role').default('user'),
-  banned: integer('banned', { mode: 'boolean' }).default(false),
-  banReason: text('banReason'),
-  banExpires: integer('banExpires', { mode: 'timestamp' }),
-});
-
-export const session = sqliteTable('session', {
-  id: text('id').primaryKey(),
-  expiresAt: integer('expiresAt', { mode: 'timestamp' }).notNull(),
-  token: text('token').notNull().unique(),
-  createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
-  ipAddress: text('ipAddress'),
-  userAgent: text('userAgent'),
-  impersonatedBy: text('impersonatedBy'), // admin plugin
-  userId: text('userId')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-});
-
-export const account = sqliteTable('account', {
-  id: text('id').primaryKey(),
-  accountId: text('accountId').notNull(),
-  providerId: text('providerId').notNull(),
-  userId: text('userId')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  accessToken: text('accessToken'),
-  refreshToken: text('refreshToken'),
-  idToken: text('idToken'),
-  accessTokenExpiresAt: integer('accessTokenExpiresAt', { mode: 'timestamp' }),
-  refreshTokenExpiresAt: integer('refreshTokenExpiresAt', { mode: 'timestamp' }),
-  scope: text('scope'),
-  password: text('password'),
-  createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
-});
-
-export const verification = sqliteTable('verification', {
-  id: text('id').primaryKey(),
-  identifier: text('identifier').notNull(),
-  value: text('value').notNull(),
-  expiresAt: integer('expiresAt', { mode: 'timestamp' }).notNull(),
-  createdAt: integer('createdAt', { mode: 'timestamp' }),
-  updatedAt: integer('updatedAt', { mode: 'timestamp' }),
-});
-
-// ── passkey plugin table (@better-auth/passkey) ─────────────────────────────
-export const passkey = sqliteTable('passkey', {
-  id: text('id').primaryKey(),
+// ── Identity ────────────────────────────────────────────────────────────────
+// Logto owns authentication (passwords, social, passkeys, MFA, email). The app
+// keeps only a thin local row keyed by the Logto subject (`sub`) — the canonical
+// user id across every service. App data FKs to `users.id`, never to an email or
+// provider id. See docs/auth-logto.md.
+export const users = sqliteTable('users', {
+  id: text('id').primaryKey(), // app-side id (nanoid)
+  logtoSub: text('logto_sub').notNull().unique(), // Logto subject — the link to identity
+  email: text('email'), // cached from the ID token; may go stale
   name: text('name'),
-  publicKey: text('publicKey').notNull(),
-  userId: text('userId')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  credentialID: text('credentialID').notNull(),
-  counter: integer('counter').notNull(),
-  deviceType: text('deviceType').notNull(),
-  backedUp: integer('backedUp', { mode: 'boolean' }).notNull(),
-  transports: text('transports'),
-  createdAt: integer('createdAt', { mode: 'timestamp' }),
-  aaguid: text('aaguid'),
+  emailVerified: integer('emailVerified', { mode: 'boolean' }).notNull().default(false),
+  createdAt: integer('createdAt').notNull(), // Date.now() ms
+});
+
+// Server-side Logto session store. The browser holds only an opaque `ms_sid`
+// cookie; the OIDC tokens live here (never in browser JS). `data` is the JSON
+// Logto storage map for that session id.
+export const logtoSessions = sqliteTable('logto_sessions', {
+  id: text('id').primaryKey(), // opaque session id (cookie value)
+  data: text('data').notNull(), // JSON: { [logtoStorageKey]: string }
+  createdAt: integer('createdAt').notNull(), // Date.now() ms
+  expiresAt: integer('expiresAt').notNull(), // Date.now() ms
 });
 
 // ── app tables ──────────────────────────────────────────────────────────────
 export const preferences = sqliteTable('preferences', {
   userId: text('userId')
     .primaryKey()
-    .references(() => user.id, { onDelete: 'cascade' }),
+    .references(() => users.id, { onDelete: 'cascade' }),
   defaultProviderId: text('defaultProviderId'),
   autoOpen: integer('autoOpen', { mode: 'boolean' }).notNull().default(true),
   updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
@@ -90,7 +38,7 @@ export const savedLinks = sqliteTable(
   'saved_links',
   {
     slug: text('slug').primaryKey(),
-    userId: text('userId').references(() => user.id, { onDelete: 'cascade' }), // null = anonymous
+    userId: text('userId').references(() => users.id, { onDelete: 'cascade' }), // null = anonymous
     ownerToken: text('ownerToken'), // anonymous owner (localStorage id) — quota + claim
     ipHash: text('ipHash'), // salted hash of creator IP (anon quota)
     lat: real('lat').notNull(),
@@ -113,19 +61,9 @@ export const linkHistory = sqliteTable(
     id: text('id').primaryKey(),
     userId: text('userId')
       .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
+      .references(() => users.id, { onDelete: 'cascade' }),
     slug: text('slug').references(() => savedLinks.slug, { onDelete: 'set null' }),
     openedAt: integer('openedAt', { mode: 'timestamp' }).notNull(),
   },
   (t) => [index('link_history_user_idx').on(t.userId, t.openedAt)],
 );
-
-// ── better-auth database rate limiter ───────────────────────────────────────
-// Required when auth.ts sets rateLimit.storage = 'database'. better-auth reads/
-// writes `key`, `count`, and `lastRequest` (a raw Date.now() millisecond number).
-export const rateLimit = sqliteTable('rateLimit', {
-  id: text('id').primaryKey(),
-  key: text('key'),
-  count: integer('count'),
-  lastRequest: integer('lastRequest'),
-});

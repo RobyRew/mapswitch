@@ -76,45 +76,27 @@ and/or a `link(target, platform)` for output), then add it to the array in
 
 ## Accounts
 
-Email + password (with email verification), **passkeys** (WebAuthn, the fastest sign-in),
-and OAuth (Google, GitHub, Apple). Built on better-auth + Drizzle + SQLite + nodemailer.
-Anonymous users are unaffected — they keep stateless `/o` links and nothing is stored.
+Authentication is delegated to the self-hosted **Logto** identity provider
+(`auth.robyrew.com`) — one account works across every RobyRew app (SSO). Logto
+hosts the whole sign-in experience: email + password, **passkeys** (WebAuthn),
+social (Google, GitHub, Microsoft, Discord, Meta, Apple), MFA, and verification
+emails. MapSwitch is registered as a **Traditional Web** Logto app: tokens are
+stored server-side (SQLite `logto_sessions`) and the browser holds only an opaque
+`ms_sid` cookie. Anonymous users are unaffected — stateless `/o` links store nothing.
 
 Required env (Dokploy, never in the repo):
 
 ```
 DB_URL=file:/app/data/mapswitch.db
-BETTER_AUTH_SECRET=        # openssl rand -base64 32
-SMTP_HOST=smtp.gmail.com  SMTP_PORT=587
-SMTP_USER=cosmin.cg22@gmail.com  SMTP_PASS=<gmail app password>  SMTP_FROM=cosmin.cg22@gmail.com
+LOGTO_ENDPOINT=https://auth.robyrew.com
+LOGTO_APP_ID=<from Logto>
+LOGTO_APP_SECRET=<from Logto>      # confidential client; server-only
 ```
 
-### OAuth credentials — where to get them
-
-Callback URL pattern (production): `https://maps.robyrew.com/api/auth/callback/<provider>`.
-
-- **Google** — [Google Cloud Console](https://console.cloud.google.com/) → *APIs & Services*
-  → *OAuth consent screen* (External; scopes openid/email/profile) → *Credentials → Create
-  credentials → OAuth client ID → Web*. Authorized redirect URI:
-  `https://maps.robyrew.com/api/auth/callback/google` (+ `http://localhost:5176/api/auth/callback/google`
-  for dev). → `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
-- **GitHub** — *Settings → Developer settings → OAuth Apps → New*. Homepage
-  `https://maps.robyrew.com`; callback `https://maps.robyrew.com/api/auth/callback/github`.
-  → `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`.
-- **Apple** (paid Apple Developer) — *Certificates, IDs & Profiles*:
-  1. An **App ID** with *Sign In with Apple* enabled.
-  2. A **Services ID** (e.g. `com.robyrew.maps.si` → `APPLE_CLIENT_ID`); configure it with
-     domain `maps.robyrew.com` and return URL `https://maps.robyrew.com/api/auth/callback/apple`.
-  3. A **Key** with *Sign In with Apple* → download the `.p8` once; note the **Key ID**.
-  4. Your **Team ID** (top-right of the membership page).
-  5. Generate the client secret JWT and set `APPLE_CLIENT_SECRET` (regenerate before ~180 days):
-     ```
-     APPLE_TEAM_ID=… APPLE_KEY_ID=… APPLE_CLIENT_ID=com.robyrew.maps.si \
-     APPLE_PRIVATE_KEY="$(cat AuthKey_XXXX.p8)" npm run apple:secret
-     ```
-  Apple rejects `localhost`, so test Apple on the deployed host. Google/GitHub work locally on `:5176`.
-
-Each provider only activates when its env vars are present, so you can add them one at a time.
+Register on the Logto Application: redirect URI `https://maps.robyrew.com/api/auth/callback`,
+post sign-out redirect `https://maps.robyrew.com/`. Social providers + MFA are
+configured **once in Logto**, not per app. Full setup + clean-cutover steps:
+**[`docs/auth-logto.md`](docs/auth-logto.md)**.
 
 ## Install (PWA) & sharing
 

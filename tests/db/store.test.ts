@@ -13,10 +13,9 @@ beforeAll(async () => {
   sqlite.pragma('foreign_keys = ON');
   const db = drizzle(sqlite, { schema });
   migrate(db, { migrationsFolder: './drizzle' });
-  const now = new Date();
-  await db.insert(schema.user).values([
-    { id: 'u1', name: 'One', email: 'one@example.com', emailVerified: true, createdAt: now, updatedAt: now },
-    { id: 'u2', name: 'Two', email: 'two@example.com', emailVerified: true, createdAt: now, updatedAt: now },
+  await db.insert(schema.users).values([
+    { id: 'u1', logtoSub: 'sub-1', name: 'One', email: 'one@example.com', emailVerified: true, createdAt: Date.now() },
+    { id: 'u2', logtoSub: 'sub-2', name: 'Two', email: 'two@example.com', emailVerified: true, createdAt: Date.now() },
   ]);
   store = createDrizzleStore(db);
 });

@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1780391129540,
-      "tag": "0000_wealthy_butterfly",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1780518254014,
-      "tag": "0001_nifty_joshua_kane",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1780519170928,
-      "tag": "0002_medical_taskmaster",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1780519570690,
-      "tag": "0003_good_sauron",
+      "when": 1780706922793,
+      "tag": "0000_flippant_vertigo",
       "breakpoints": true
     }
   ]

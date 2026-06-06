@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { buildShareUrl } from '@/lib/share/encode';
 import { parseLatLngPair } from '@/lib/parse/coords';
-import { authClient } from '@/lib/auth/client';
 import { getAnonId } from './hooks/useAnonId';
 
 export interface ShareStrings {
@@ -33,8 +32,21 @@ const inputCls =
   'w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-base text-text outline-none focus:border-accent';
 
 export default function ShareLinkGenerator({ baseUrl, strings }: { baseUrl: string; strings: ShareStrings }) {
-  const { data: session } = authClient.useSession();
-  const signedIn = !!session?.user;
+  // Static page → learn signed-in state from a tiny server probe (tokens are
+  // server-side; there's no client-readable session).
+  const [signedIn, setSignedIn] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/auth/me')
+      .then((r) => r.json())
+      .then((d: { signedIn?: boolean }) => {
+        if (alive) setSignedIn(!!d.signedIn);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const [coords, setCoords] = useState('');
   const [label, setLabel] = useState('');
