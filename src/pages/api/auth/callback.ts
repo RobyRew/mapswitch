@@ -16,7 +16,8 @@ export const GET: APIRoute = async ({ cookies, url, redirect }) => {
     await client.handleSignInCallback(callbackUrl);
     const { claims } = await client.getContext();
     if (claims) resolveAppUser(claims as LogtoIdClaims); // create the local user row now
-  } catch {
+  } catch (err) {
+    console.error('[auth/callback] sign-in failed:', err instanceof Error ? err.message : err);
     return redirect('/api/auth/sign-in', 302);
   }
 

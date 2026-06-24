@@ -36,7 +36,8 @@ export async function getUser(request: Request): Promise<SessionUser | null> {
       name: u.name ?? '',
       emailVerified: !!u.emailVerified,
     };
-  } catch {
+  } catch (err) {
+    console.error('[auth/session] getUser failed:', err instanceof Error ? err.message : err);
     return null;
   }
 }

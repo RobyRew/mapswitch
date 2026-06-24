@@ -14,8 +14,8 @@ const handler: APIRoute = async ({ cookies, url, redirect }) => {
         target = u;
       });
       await client.signOut(`${publicOrigin(url.origin)}/`);
-    } catch {
-      /* fall through to local cleanup even if Logto is unreachable */
+    } catch (err) {
+      console.warn('[auth/sign-out] Logto end-session failed (clearing local session anyway):', err instanceof Error ? err.message : err);
     }
     dropSession(sid);
     cookies.delete(SID_COOKIE, { path: '/' });
