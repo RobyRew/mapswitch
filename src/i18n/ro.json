@@ -17,6 +17,14 @@
   "chooser": {
     "openIn": "Deschide în…",
     "remember": "Reține alegerea mea",
-    "unavailable": "Nu pe acest dispozitiv"
+    "unavailable": "Nu pe acest dispozitiv",
+    "radarbotSetup": "Radarbot se deschide printr-o scurtătură Apple (o singură dată).",
+    "radarbotSetupLink": "Configurează →",
+    "share": {
+      "neutralTitle": "Distribuie acest loc",
+      "copyNeutral": "Copiază linkul neutru",
+      "shareButton": "Distribuie…",
+      "copyAppLink": "Copiază linkul"
+    }
   }
 }

@@ -17,6 +17,14 @@
   "chooser": {
     "openIn": "Obre a…",
     "remember": "Recorda la meva elecció",
-    "unavailable": "No en aquest dispositiu"
+    "unavailable": "No en aquest dispositiu",
+    "radarbotSetup": "Radarbot s'obre amb una drecera d'Apple (un sol cop).",
+    "radarbotSetupLink": "Configura-ho →",
+    "share": {
+      "neutralTitle": "Comparteix aquest lloc",
+      "copyNeutral": "Copia l'enllaç neutral",
+      "shareButton": "Comparteix…",
+      "copyAppLink": "Copia l'enllaç"
+    }
   }
 }

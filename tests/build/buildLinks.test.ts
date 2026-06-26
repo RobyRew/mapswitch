@@ -10,11 +10,10 @@ describe('buildForRegistry — platform behaviour', () => {
     expect(rb?.href).toContain('geo:');
   });
 
-  it('ios shows Radarbot as an explicit disabled option', () => {
+  it('ios offers Radarbot via the Shortcuts bridge', () => {
     const rb = buildForRegistry(place, 'ios').find((o) => o.id === 'radarbot');
-    expect(rb).toBeTruthy();
-    expect(rb?.available).toBe(false);
-    expect(rb?.href).toBeNull();
+    expect(rb?.available).toBe(true);
+    expect(rb?.href).toContain('shortcuts://run-shortcut');
   });
 
   it('web omits Radarbot and the geo system-chooser entirely', () => {

@@ -116,6 +116,25 @@ service worker — it caches only the static shell, never `/api/*` or your links
 
 App icons are generated from `public/favicon.svg` with `npm run icons`.
 
+## Radarbot on iOS
+
+Radarbot has no public URL scheme; on iOS the only entry point is its SiriKit
+`Navigate to` action, which requires a **Placemark** object — a raw `lat,lng` string
+can't be injected. MapSwitch bridges this through a one-time Apple Shortcut.
+
+On **Android** it already works through the generic `geo:` chooser — nothing to set up.
+On **iOS**, create a Shortcut named **exactly** `Open in Radarbot`:
+
+1. *Shortcuts → ＋* → name it `Open in Radarbot`.
+2. Add **Find Locations** (a.k.a. *Buscar ubicaciones*) and set its input to the
+   Shortcut's **Shortcut Input**.
+3. Add the Radarbot **Navigate to** action; long-press its location field → *Select
+   Magic Variable* → choose the **Locations** output of step 2.
+
+Then MapSwitch's *Radarbot* button on iOS opens
+`shortcuts://run-shortcut?name=Open%20in%20Radarbot&input=text&text=<lat,lng>`, which
+feeds the coordinates through the bridge into Radarbot navigation.
+
 ## Roadmap
 
 More providers (Organic Maps, OsmAnd, HERE) · native iOS share-extension app ·

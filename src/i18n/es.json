@@ -27,7 +27,15 @@
   "chooser": {
     "openIn": "Abrir en…",
     "remember": "Recordar mi elección",
-    "unavailable": "No en este dispositivo"
+    "unavailable": "No en este dispositivo",
+    "radarbotSetup": "Radarbot se abre con un atajo de Apple (una sola vez).",
+    "radarbotSetupLink": "Configúralo →",
+    "share": {
+      "neutralTitle": "Comparte este lugar",
+      "copyNeutral": "Copiar enlace neutral",
+      "shareButton": "Compartir…",
+      "copyAppLink": "Copiar enlace"
+    }
   },
   "share": {
     "title": "Compartir un lugar",
@@ -40,6 +48,10 @@
     "copy": "Copiar enlace",
     "copied": "¡Copiado!",
     "invalid": "Introduce coordenadas válidas como \"lat, lng\".",
+    "locationDenied": "Permiso de ubicación denegado: actívalo en los ajustes del navegador.",
+    "locationUnavailable": "No se pudo determinar tu ubicación. Inténtalo de nuevo o escribe las coordenadas.",
+    "locationTimeout": "Se agotó el tiempo de localización. Inténtalo de nuevo o escribe las coordenadas.",
+    "locationUnsupported": "Este navegador no admite la ubicación.",
     "yourLink": "Tu enlace para compartir"
   },
   "open": {

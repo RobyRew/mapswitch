@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 import { isLocale, DEFAULT_LOCALE, type Locale, t } from '@/i18n/utils';
+import { shareActionsStrings } from '@/i18n/strings';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import OpenHandler from '@/islands/OpenHandler';
 import { decodeShareParams } from '@/lib/share/encode';
@@ -22,6 +23,11 @@ const strings = {
     openIn: t(locale, 'chooser.openIn'),
     remember: t(locale, 'chooser.remember'),
     unavailable: t(locale, 'chooser.unavailable'),
+    copyAppLink: t(locale, 'chooser.share.copyAppLink'),
+    copied: t(locale, 'share.copied'),
+    radarbotSetup: t(locale, 'chooser.radarbotSetup'),
+    radarbotSetupLink: t(locale, 'chooser.radarbotSetupLink'),
+    shareActions: shareActionsStrings(locale),
   },
   manager: {
     defaultLabel: t(locale, 'manager.defaultLabel'),
