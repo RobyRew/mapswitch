@@ -49,7 +49,7 @@
     "copied": "Copied!",
     "invalid": "Enter valid coordinates as \"lat, lng\".",
     "locationDenied": "Location permission denied — enable it in your browser settings.",
-    "locationUnavailable": "Couldn't determine your location. Try again or type coordinates.",
+    "locationUnavailable": "Couldn't get your location. On macOS, check Location Services is on for Safari (System Settings → Privacy & Security → Location Services). Or type coordinates.",
     "locationTimeout": "Locating timed out. Try again or type coordinates.",
     "locationUnsupported": "This browser doesn't support location.",
     "yourLink": "Your shareable link"

@@ -49,7 +49,7 @@
     "copied": "¡Copiado!",
     "invalid": "Introduce coordenadas válidas como \"lat, lng\".",
     "locationDenied": "Permiso de ubicación denegado: actívalo en los ajustes del navegador.",
-    "locationUnavailable": "No se pudo determinar tu ubicación. Inténtalo de nuevo o escribe las coordenadas.",
+    "locationUnavailable": "No se pudo obtener tu ubicación. En macOS, activa los Servicios de localización para Safari (Ajustes → Privacidad y seguridad → Localización). O escribe las coordenadas.",
     "locationTimeout": "Se agotó el tiempo de localización. Inténtalo de nuevo o escribe las coordenadas.",
     "locationUnsupported": "Este navegador no admite la ubicación.",
     "yourLink": "Tu enlace para compartir"

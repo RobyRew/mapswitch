@@ -31,6 +31,7 @@ export default function ShareLinkGenerator({
   const [target, setTarget] = useState<BuildTarget | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
+  const [debug, setDebug] = useState<string | null>(null); // TEMP: geolocation diagnostics
 
   function generate() {
     setError(null);
@@ -43,21 +44,40 @@ export default function ShareLinkGenerator({
     setTarget({ ...pair, label: label.trim() || undefined });
   }
 
-  function useLocation() {
+  async function detectLocation() {
+    setError(null);
+    setDebug(null);
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setError(strings.locationUnsupported);
+      setDebug('navigator.geolocation is unavailable');
       return;
     }
-    setError(null);
+
+    // Best-effort permission state (Safari historically didn't support this query).
+    let permission = 'unknown';
+    try {
+      const p = await navigator.permissions?.query?.({ name: 'geolocation' as PermissionName });
+      permission = p?.state ?? 'unknown';
+    } catch {
+      /* permissions.query unsupported for geolocation */
+    }
+    const t0 = Date.now();
+    const env = `secure=${typeof window !== 'undefined' && window.isSecureContext} · permission=${permission}`;
+    console.info('[geo] requesting location', { permission, secureContext: window.isSecureContext });
     setLocating(true);
 
     const onOk = (pos: GeolocationPosition) => {
-      setCoords(`${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`);
+      const { latitude, longitude, accuracy } = pos.coords;
+      console.info('[geo] success', { latitude, longitude, accuracy, ms: Date.now() - t0 });
+      setCoords(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+      setDebug(`ok · ±${Math.round(accuracy)}m · ${Date.now() - t0}ms · ${env}`);
       setLocating(false);
     };
     const onErr = (err: GeolocationPositionError, retried: boolean) => {
+      console.warn('[geo] error', { code: err.code, message: err.message, retried, ms: Date.now() - t0 });
       // High-accuracy can stall on desktop Wi-Fi/IP geolocation — fall back once.
       if (!retried && (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE)) {
+        console.info('[geo] retrying with low accuracy');
         navigator.geolocation.getCurrentPosition(onOk, (e) => onErr(e, true), {
           enableHighAccuracy: false,
           timeout: 12000,
@@ -73,6 +93,7 @@ export default function ShareLinkGenerator({
             ? strings.locationUnavailable
             : strings.locationTimeout,
       );
+      setDebug(`code=${err.code} "${err.message || 'no message'}" · retried=${retried} · ${env}`);
     };
 
     navigator.geolocation.getCurrentPosition(onOk, (e) => onErr(e, false), {
@@ -90,7 +111,7 @@ export default function ShareLinkGenerator({
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={useLocation}
+          onClick={() => void detectLocation()}
           disabled={locating}
           className="rounded-lg border border-border px-4 py-2.5 font-medium text-text hover:bg-surface-2 disabled:opacity-60"
         >
@@ -106,6 +127,7 @@ export default function ShareLinkGenerator({
       </div>
 
       {error && <p className="text-sm text-danger">{error}</p>}
+      {debug && <p className="break-all font-mono text-xs text-text-3">🔧 geo: {debug}</p>}
 
       {target && (
         <div className="mt-1 border-t border-border pt-3">
