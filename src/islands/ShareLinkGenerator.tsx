@@ -14,6 +14,7 @@ export interface ShareStrings {
   locationUnavailable: string;
   locationTimeout: string;
   locationUnsupported: string;
+  approxLocation: string;
 }
 
 const inputCls =
@@ -32,6 +33,7 @@ export default function ShareLinkGenerator({
   const [error, setError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
   const [debug, setDebug] = useState<string | null>(null); // TEMP: geolocation diagnostics
+  const [approx, setApprox] = useState(false);
 
   function generate() {
     setError(null);
@@ -44,10 +46,34 @@ export default function ShareLinkGenerator({
     setTarget({ ...pair, label: label.trim() || undefined });
   }
 
+  // Approximate, city-level location from the request IP — only used when the
+  // browser's Geolocation API can't get a fix.
+  async function ipFallback(startedAt: number): Promise<boolean> {
+    try {
+      const res = await fetch('/api/geoip');
+      if (!res.ok) return false;
+      const d = (await res.json()) as { lat?: number; lng?: number; label?: string };
+      if (typeof d.lat !== 'number' || typeof d.lng !== 'number') return false;
+      console.info('[geo] ip fallback', { label: d.label, ms: Date.now() - startedAt });
+      setCoords(`${d.lat.toFixed(6)}, ${d.lng.toFixed(6)}`);
+      if (d.label && !label.trim()) setLabel(d.label);
+      setApprox(true);
+      setLocating(false);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async function detectLocation() {
     setError(null);
     setDebug(null);
+    setApprox(false);
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      // No browser geolocation at all → go straight to the IP fallback.
+      setLocating(true);
+      if (await ipFallback(Date.now())) return;
+      setLocating(false);
       setError(strings.locationUnsupported);
       setDebug('navigator.geolocation is unavailable');
       return;
@@ -76,29 +102,33 @@ export default function ShareLinkGenerator({
     const onErr = (err: GeolocationPositionError, retried: boolean) => {
       console.warn('[geo] error', { code: err.code, message: err.message, retried, ms: Date.now() - t0 });
       // High-accuracy can stall on desktop Wi-Fi/IP geolocation — fall back once.
-      if (!retried && (err.code === err.TIMEOUT || err.code === err.POSITION_UNAVAILABLE)) {
+      if (!retried && err.code === err.TIMEOUT) {
         console.info('[geo] retrying with low accuracy');
         navigator.geolocation.getCurrentPosition(onOk, (e) => onErr(e, true), {
           enableHighAccuracy: false,
-          timeout: 12000,
+          timeout: 7000,
           maximumAge: 60000,
         });
         return;
       }
-      setLocating(false);
-      setError(
-        err.code === err.PERMISSION_DENIED
-          ? strings.locationDenied
-          : err.code === err.POSITION_UNAVAILABLE
-            ? strings.locationUnavailable
-            : strings.locationTimeout,
-      );
-      setDebug(`code=${err.code} "${err.message || 'no message'}" · retried=${retried} · ${env}`);
+      // Browser couldn't get a fix → approximate IP-based fallback (city level).
+      void ipFallback(t0).then((ok) => {
+        if (ok) return;
+        setLocating(false);
+        setError(
+          err.code === err.PERMISSION_DENIED
+            ? strings.locationDenied
+            : err.code === err.POSITION_UNAVAILABLE
+              ? strings.locationUnavailable
+              : strings.locationTimeout,
+        );
+        setDebug(`code=${err.code} "${err.message || 'no message'}" · retried=${retried} · ${env}`);
+      });
     };
 
     navigator.geolocation.getCurrentPosition(onOk, (e) => onErr(e, false), {
       enableHighAccuracy: true,
-      timeout: 8000,
+      timeout: 7000,
       maximumAge: 0,
     });
   }
@@ -127,6 +157,7 @@ export default function ShareLinkGenerator({
       </div>
 
       {error && <p className="text-sm text-danger">{error}</p>}
+      {approx && <p className="text-xs text-text-3">📍 {strings.approxLocation}</p>}
       {debug && <p className="break-all font-mono text-xs text-text-3">🔧 geo: {debug}</p>}
 
       {target && (

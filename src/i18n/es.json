@@ -52,6 +52,7 @@
     "locationUnavailable": "No se pudo obtener tu ubicación. En macOS, activa los Servicios de localización para Safari (Ajustes → Privacidad y seguridad → Localización). O escribe las coordenadas.",
     "locationTimeout": "Se agotó el tiempo de localización. Inténtalo de nuevo o escribe las coordenadas.",
     "locationUnsupported": "Este navegador no admite la ubicación.",
+    "approxLocation": "Ubicación aproximada según tu red — ajusta las coordenadas si hace falta.",
     "yourLink": "Tu enlace para compartir"
   },
   "open": {

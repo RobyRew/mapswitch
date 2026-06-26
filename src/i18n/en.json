@@ -52,6 +52,7 @@
     "locationUnavailable": "Couldn't get your location. On macOS, check Location Services is on for Safari (System Settings → Privacy & Security → Location Services). Or type coordinates.",
     "locationTimeout": "Locating timed out. Try again or type coordinates.",
     "locationUnsupported": "This browser doesn't support location.",
+    "approxLocation": "Approximate location from your network — adjust the coordinates if needed.",
     "yourLink": "Your shareable link"
   },
   "open": {
