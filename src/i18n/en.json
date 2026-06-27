@@ -9,7 +9,8 @@
     "settings": "Settings",
     "privacy": "Privacy",
     "about": "About",
-    "account": "Account"
+    "account": "Account",
+    "use": "Links & API"
   },
   "home": {
     "title": "Open any map link in your app",

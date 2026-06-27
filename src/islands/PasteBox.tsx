@@ -59,7 +59,8 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
   // redirects here with ?s=…; we also accept raw ?url=/?text=/?title= params.
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
-    const shared = sp.get('s') ?? sp.get('url') ?? sp.get('text') ?? sp.get('title');
+    const shared =
+      sp.get('to') ?? sp.get('q') ?? sp.get('s') ?? sp.get('url') ?? sp.get('text') ?? sp.get('title');
     if (!shared) return;
     setValue(shared);
     void resolve(shared);

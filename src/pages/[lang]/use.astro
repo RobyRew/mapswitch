@@ -1,0 +1,73 @@
+---
+export const prerender = true;
+import { LOCALES, isLocale, type Locale, t } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+const locale: Locale = isLocale(lang) ? lang : 'en';
+const base = (import.meta.env.PUBLIC_SITE_URL || 'https://maps.robyrew.com').replace(/\/$/, '');
+
+const goQuery = `${base}/go?to=<link-or-coords>`;
+const goPath = `${base}/go/41.1151,1.21836`;
+const goEncoded = `${base}/go?to=https%3A%2F%2Fmaps.app.goo.gl%2FJ6VcNgZTzK4WtZFm6`;
+const prefill = `${base}/?to=41.1151,1.21836`;
+const neutral = `${base}/o?ll=41.1151,1.21836&q=Hotel%20Tarraco%20Park`;
+const shortLink = `${base}/x/<slug>`;
+const apiGet = `GET ${base}/api/resolve?input=<link-or-coords>`;
+const curlGet = `curl -s "${base}/api/resolve?input=41.1151,1.21836"`;
+const curlPost = `curl -s ${base}/api/resolve \\
+  -H 'content-type: application/json' \\
+  -d '{"input":"https://maps.app.goo.gl/J6VcNgZTzK4WtZFm6"}'`;
+const jsonShape = `{ "match": { "lat": 41.1151, "lng": 1.21836, "label": "…", "source": "google" } }`;
+
+const box = 'block overflow-x-auto whitespace-pre rounded-lg border border-border bg-surface-2 p-3 text-sm text-text';
+const h2 = 'mt-2 text-xl font-semibold text-text';
+---
+
+<BaseLayout locale={locale} title={t(locale, 'nav.use')}>
+  <article class="flex flex-col gap-5 leading-relaxed text-text-2">
+    <header class="flex flex-col gap-2">
+      <h1 class="text-2xl font-semibold text-text sm:text-3xl">Use it anywhere</h1>
+      <p>
+        MapSwitch can open or resolve a location straight from a URL — handy for bookmarks, Apple
+        Shortcuts, bots, or your own apps. Every entry accepts the same inputs: a Google / Apple / Waze /
+        Yandex / OSM link (short or full), <code>lat,lng</code>, a Plus Code, an <code>/o</code> link, or a
+        place name.
+      </p>
+    </header>
+
+    <h2 class={h2}>Quick-open link</h2>
+    <p>Resolve anything and jump to the app chooser (auto-opens your default app if you set one):</p>
+    <pre class={box}>{goQuery}</pre>
+    <p>Coordinates and Plus Codes also work as a clean path:</p>
+    <pre class={box}>{goPath}</pre>
+    <p>With a Google link, URL-encode it in the <code>to=</code> value:</p>
+    <pre class={box}>{goEncoded}</pre>
+
+    <h2 class={h2}>Open the site pre-filled</h2>
+    <p>Same inputs, but lands on the homepage with the result already resolved:</p>
+    <pre class={box}>{prefill}</pre>
+
+    <h2 class={h2}>Neutral share link</h2>
+    <p>App-agnostic — whoever opens it picks their own map app. This is what “Share” produces:</p>
+    <pre class={box}>{neutral}</pre>
+    <p>Saved / shortened links look like <code>{shortLink}</code>.</p>
+
+    <h2 class={h2}>JSON API</h2>
+    <p>For scripts and integrations:</p>
+    <pre class={box}>{apiGet}</pre>
+    <pre class={box}>{curlGet}</pre>
+    <p>Or POST JSON:</p>
+    <pre class={box}>{curlPost}</pre>
+    <p>Both return:</p>
+    <pre class={box}>{jsonShape}</pre>
+    <p class="text-sm text-text-3">
+      Endpoints are rate-limited and never log your input or coordinates. Short links are expanded
+      server-side against a strict allow-list of map domains.
+    </p>
+  </article>
+</BaseLayout>

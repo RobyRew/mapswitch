@@ -53,7 +53,7 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
       <div class="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
         <a href={path(locale)} class="text-base font-semibold text-text">🗺️ {t(locale, 'site.name')}</a>
         <nav class="flex items-center gap-4 text-sm text-text-2">
-          <a href={path(locale, 'share')} class="hover:text-accent">{t(locale, 'nav.share')}</a>
+          <a href={`${path(locale)}#share`} class="hover:text-accent">{t(locale, 'nav.share')}</a>
           <a href={path(locale, 'settings')} class="hover:text-accent">{t(locale, 'nav.settings')}</a>
           <a href={path(locale, 'account')} class="hover:text-accent">{t(locale, 'nav.account')}</a>
         </nav>
@@ -67,6 +67,7 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
     <footer class="border-t border-border">
       <div class="mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-text-3">
         <div class="flex gap-4">
+          <a href={path(locale, 'use')} class="hover:text-accent">{t(locale, 'nav.use')}</a>
           <a href={path(locale, 'privacy')} class="hover:text-accent">{t(locale, 'nav.privacy')}</a>
           <a href={path(locale, 'about')} class="hover:text-accent">{t(locale, 'nav.about')}</a>
         </div>
