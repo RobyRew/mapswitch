@@ -66,12 +66,23 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
 
     <footer class="border-t border-border">
       <div class="mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-text-3">
-        <div class="flex gap-4">
+        <div class="flex flex-wrap gap-4">
           <a href={path(locale, 'use')} class="hover:text-accent">{t(locale, 'nav.use')}</a>
           <a href={path(locale, 'privacy')} class="hover:text-accent">{t(locale, 'nav.privacy')}</a>
           <a href={path(locale, 'about')} class="hover:text-accent">{t(locale, 'nav.about')}</a>
+          <a
+            href="https://github.com/RobyRew/mapswitch"
+            target="_blank"
+            rel="noreferrer"
+            class="hover:text-accent">GitHub</a
+          >
         </div>
-        <span>{t(locale, 'footer.madeBy')}</span>
+        <span>
+          {t(locale, 'footer.madeBy')} · by{' '}
+          <a href="https://github.com/robyrew" target="_blank" rel="noreferrer" class="font-medium hover:text-accent"
+            >RobyRew</a
+          >
+        </span>
       </div>
     </footer>
   </body>

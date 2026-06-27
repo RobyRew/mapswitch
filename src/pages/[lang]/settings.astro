@@ -1,8 +1,9 @@
 ---
 export const prerender = true;
-import { LOCALES, isLocale, type Locale, t } from '@/i18n/utils';
+import { LOCALES, isLocale, type Locale, t, path } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import DefaultAppManager from '@/islands/DefaultAppManager';
+import SettingsExtras from '@/islands/SettingsExtras';
 
 export function getStaticPaths() {
   return LOCALES.map((lang) => ({ params: { lang } }));
@@ -11,12 +12,24 @@ export function getStaticPaths() {
 const { lang } = Astro.params;
 const locale: Locale = isLocale(lang) ? lang : 'en';
 
-const strings = {
+const LANG_NAMES: Record<Locale, string> = { en: 'English', es: 'Español', ca: 'Català', ro: 'Română' };
+
+const managerStrings = {
   defaultLabel: t(locale, 'manager.defaultLabel'),
   none: t(locale, 'manager.none'),
   change: t(locale, 'manager.change'),
   reset: t(locale, 'manager.reset'),
   autoOpen: t(locale, 'manager.autoOpen'),
+};
+
+const extrasStrings = {
+  theme: t(locale, 'settings.theme'),
+  themeSystem: t(locale, 'settings.themeSystem'),
+  themeLight: t(locale, 'settings.themeLight'),
+  themeDark: t(locale, 'settings.themeDark'),
+  clearData: t(locale, 'settings.clearData'),
+  clearDataDesc: t(locale, 'settings.clearDataDesc'),
+  cleared: t(locale, 'settings.cleared'),
 };
 ---
 
@@ -26,6 +39,29 @@ const strings = {
       <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'settings.title')}</h1>
       <p class="text-text-2">{t(locale, 'settings.subtitle')}</p>
     </div>
-    <DefaultAppManager client:load strings={strings} />
+
+    <DefaultAppManager client:load strings={managerStrings} />
+
+    <div class="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4 text-sm">
+      <span class="text-text-2">{t(locale, 'settings.language')}</span>
+      <div class="flex flex-wrap gap-2">
+        {
+          LOCALES.map((loc) => (
+            <a
+              href={path(loc, 'settings')}
+              class={`rounded-md border px-3 py-1.5 transition ${
+                loc === locale
+                  ? 'border-accent bg-accent text-accent-text'
+                  : 'border-border text-text hover:bg-surface-3'
+              }`}
+            >
+              {LANG_NAMES[loc]}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <SettingsExtras client:load strings={extrasStrings} />
   </section>
 </BaseLayout>

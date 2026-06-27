@@ -71,7 +71,15 @@
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Manage your default map app. This is stored only in this browser — nowhere else."
+    "subtitle": "Preferences for this browser — synced to your account when you're signed in.",
+    "language": "Language",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "clearData": "Clear local data",
+    "clearDataDesc": "Removes your default app, theme and anonymous ID stored in this browser. Your account (if any) isn't affected.",
+    "cleared": "Cleared — reloading…"
   },
   "privacy": {
     "title": "Privacy",

@@ -71,7 +71,15 @@
   },
   "settings": {
     "title": "Ajustes",
-    "subtitle": "Gestiona tu app de mapas por defecto. Se guarda solo en este navegador, en ningún otro sitio."
+    "subtitle": "Preferencias de este navegador — se sincronizan con tu cuenta si inicias sesión.",
+    "language": "Idioma",
+    "theme": "Tema",
+    "themeSystem": "Sistema",
+    "themeLight": "Claro",
+    "themeDark": "Oscuro",
+    "clearData": "Borrar datos locales",
+    "clearDataDesc": "Elimina tu app por defecto, el tema y el ID anónimo guardados en este navegador. Tu cuenta (si tienes) no se ve afectada.",
+    "cleared": "Borrado — recargando…"
   },
   "privacy": {
     "title": "Privacidad",
