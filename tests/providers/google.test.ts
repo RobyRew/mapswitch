@@ -32,6 +32,15 @@ describe('google provider — input shapes', () => {
     });
   });
 
+  it('directional coords inside a business-link address string', () => {
+    const url = new URL(
+      'https://maps.google.com/maps?q=' +
+        encodeURIComponent('Hotel Tarraco Park, Carretera València, 206 / N: 41.1151 - E: 1.21836, 43006 Tarragona') +
+        '&ftid=0x12a3fd5313e08f6b:0xcd1e037dd18cbb90&entry=gps',
+    );
+    expect(P(url)).toMatchObject({ lat: 41.1151, lng: 1.21836, label: 'Hotel Tarraco Park' });
+  });
+
   it('builds the universal api=1 link', () => {
     expect(google.link!({ lat: 1, lng: 2 }, 'android')).toBe(
       'https://www.google.com/maps/search/?api=1&query=1,2',

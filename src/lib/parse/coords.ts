@@ -35,3 +35,19 @@ export function parseLatLngPair(input: string): LatLng | null {
   if (!isValidLatLng(lat, lng)) return null;
   return { lat: roundCoord(lat), lng: roundCoord(lng) };
 }
+
+/**
+ * Parse directional coordinates embedded in free text, e.g. the address string
+ * Google puts in business/hotel links: "… N: 41.1151 - E: 1.21836 …" (also
+ * "S 12.34 W 56.78"). Both numbers must carry decimals so house numbers like
+ * "N: 206" can't false-match. null if a N/S + E/W pair isn't found.
+ */
+export function parseDirectionalLatLng(text: string): LatLng | null {
+  const ns = text.match(/(?:^|[^A-Za-z])([NS])\s*:?\s*(\d{1,2}\.\d+)/i);
+  const ew = text.match(/(?:^|[^A-Za-z])([EW])\s*:?\s*(\d{1,3}\.\d+)/i);
+  if (!ns || !ew) return null;
+  const lat = (ns[1]!.toUpperCase() === 'S' ? -1 : 1) * Number(ns[2]);
+  const lng = (ew[1]!.toUpperCase() === 'W' ? -1 : 1) * Number(ew[2]);
+  if (!isValidLatLng(lat, lng)) return null;
+  return { lat: roundCoord(lat), lng: roundCoord(lng) };
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseLatLngPair } from '@/lib/parse/coords';
+import { parseLatLngPair, parseDirectionalLatLng } from '@/lib/parse/coords';
 import { parsePure } from '@/lib/parse/pipeline';
 
 describe('parseLatLngPair tolerance', () => {
@@ -21,5 +21,22 @@ describe('parseLatLngPair tolerance', () => {
     const m = parsePure('(41.2228496, 1.1535256)')!;
     expect(m.source).toBe('coords');
     expect(m.lat).toBeCloseTo(41.2228496, 5);
+  });
+});
+
+describe('parseDirectionalLatLng', () => {
+  it('reads N/E directional coords from prose', () => {
+    expect(parseDirectionalLatLng('… 206 / N: 41.1151 - E: 1.21836, Tarragona')).toMatchObject({
+      lat: 41.1151,
+      lng: 1.21836,
+    });
+  });
+
+  it('applies S/W as negative', () => {
+    expect(parseDirectionalLatLng('S 33.8688 W 151.2093')).toMatchObject({ lat: -33.8688, lng: -151.2093 });
+  });
+
+  it('ignores integer house numbers (no decimals)', () => {
+    expect(parseDirectionalLatLng('Carrer N: 206, Nord 5, Entrada E')).toBeNull();
   });
 });

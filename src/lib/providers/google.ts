@@ -1,5 +1,5 @@
 import type { Provider } from './types';
-import { isValidLatLng, parseLatLngPair, roundCoord } from '../parse/coords';
+import { isValidLatLng, parseLatLngPair, parseDirectionalLatLng, roundCoord } from '../parse/coords';
 
 function isGoogleHost(url: URL): boolean {
   const h = url.hostname.toLowerCase();
@@ -84,6 +84,16 @@ export const google: Provider = {
       if (isValidLatLng(lat, lng)) {
         return { lat: roundCoord(lat), lng: roundCoord(lng), label: placeLabel(url), source: 'google' };
       }
+    }
+
+    // 5. Directional coords inside an address string — Google business/hotel
+    //    links carry e.g. "… N: 41.1151 - E: 1.21836 …" (no comma pair).
+    const dir = parseDirectionalLatLng(decoded);
+    if (dir) {
+      const q = sp.get('q');
+      const name = q ? q.split(/[,/]/)[0]?.trim() : undefined;
+      const label = name && !parseLatLngPair(name) ? name : placeLabel(url);
+      return { ...dir, label, source: 'google' };
     }
 
     return null;
