@@ -31,8 +31,9 @@ export function shareActionsStrings(locale: Locale): ShareActionsStrings {
   return {
     neutralTitle: t(locale, 'chooser.share.neutralTitle'),
     namePlaceholder: t(locale, 'share.labelPlaceholder'),
+    modeNeutral: t(locale, 'chooser.share.modeNeutral'),
+    modeShort: t(locale, 'chooser.share.modeShort'),
     yourLink: t(locale, 'share.yourLink'),
-    copyNeutral: t(locale, 'chooser.share.copyNeutral'),
     shareButton: t(locale, 'chooser.share.shareButton'),
     customSlugPlaceholder: t(locale, 'chooser.share.customSlugPlaceholder'),
     customSlugClaim: t(locale, 'chooser.share.customSlugClaim'),

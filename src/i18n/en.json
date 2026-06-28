@@ -31,6 +31,8 @@
     "share": {
       "neutralTitle": "Share this place",
       "copyNeutral": "Copy neutral link",
+      "modeNeutral": "Neutral link",
+      "modeShort": "Short link",
       "shareButton": "Share…",
       "qr": "QR",
       "copyAppLink": "Copy link",

@@ -11,16 +11,17 @@ import QrCode from './QrCode';
 export interface ShareActionsStrings {
   neutralTitle: string;
   namePlaceholder: string;
+  modeNeutral: string;
+  modeShort: string;
   yourLink: string;
-  copyNeutral: string;
+  yourShortLink: string;
+  copy: string;
+  copied: string;
   shareButton: string;
   customSlugPlaceholder: string;
   customSlugClaim: string;
   accountHref: string;
-  copy: string;
-  copied: string;
   saveShorten: string;
-  yourShortLink: string;
   expiry: ExpiryStrings;
   anonNote: string;
   weeklyLimit: string;
@@ -31,9 +32,9 @@ export interface ShareActionsStrings {
 const canShare = () => typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
 /**
- * Share toolkit for a resolved place: copy/share/QR the neutral /o link, and
- * save a DB-backed short slug (with a chosen expiry for signed-in users, weekly
- * quota for anonymous).
+ * One unified share panel for a resolved place: name it, pick the link type
+ * (neutral /o or a saved short /x), and the chosen link shows once with Copy ·
+ * Share and an auto-rendered QR.
  */
 export default function ShareActions({
   target,
@@ -46,22 +47,24 @@ export default function ShareActions({
 }) {
   const signedIn = useSignedIn();
   const { prefs, loaded } = usePreferences();
+  const [mode, setMode] = useState<'neutral' | 'short'>('neutral');
+  const [name, setName] = useState(target.label ?? '');
   const [expiry, setExpiry] = useState<ExpiryToken>(DEFAULT_EXPIRY);
+  const [customSlug, setCustomSlug] = useState('');
+  const [username, setUsername] = useState<string | null>(null);
   const [shortLink, setShortLink] = useState<string | null>(null);
   const [shortNote, setShortNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [copied, setCopied] = useState<'neutral' | 'short' | null>(null);
-  const [name, setName] = useState(target.label ?? '');
-  const [customSlug, setCustomSlug] = useState('');
-  const [username, setUsername] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  // Preselect the user's default expiry once prefs load.
   useEffect(() => {
     if (loaded) setExpiry(prefs.defaultExpiry);
   }, [loaded, prefs.defaultExpiry]);
 
-  // Learn the account's username (for vanity /x/<username>/<slug> links).
+  useEffect(() => setName(target.label ?? ''), [target.lat, target.lng, target.label]);
+  useEffect(() => setCopied(false), [mode, shortLink]);
+
   useEffect(() => {
     if (!signedIn) return;
     let alive = true;
@@ -76,17 +79,15 @@ export default function ShareActions({
     };
   }, [signedIn]);
 
-  // Re-sync the editable name when a different place is resolved.
-  useEffect(() => setName(target.label ?? ''), [target.lat, target.lng, target.label]);
-
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const effective = { ...target, label: name.trim() || undefined };
   const neutralLink = buildShareUrl(origin, effective);
 
-  async function copy(value: string, which: 'neutral' | 'short') {
+  async function copy(value: string) {
     try {
       await navigator.clipboard.writeText(value);
-      setCopied(which);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
     } catch {
       /* ignore */
     }
@@ -100,9 +101,8 @@ export default function ShareActions({
     }
   }
 
-  async function saveShorten() {
+  async function createShort() {
     setError(null);
-    setCopied(null);
     setShortLink(null);
     setShortNote(null);
     setSaving(true);
@@ -135,6 +135,49 @@ export default function ShareActions({
     }
   }
 
+  function linkPanel(url: string, label: string) {
+    return (
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4">
+        <span className="text-xs text-text-3">{label}</span>
+        <code className="block break-all text-sm text-text">{url}</code>
+        <div className="flex justify-center">
+          <QrCode value={url} />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => copy(url)}
+            className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-text hover:bg-accent-hover"
+          >
+            {copied ? strings.copied : strings.copy}
+          </button>
+          {canShare() && (
+            <button
+              type="button"
+              onClick={() => share(url)}
+              className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-3"
+            >
+              {strings.shareButton}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const tab = (value: 'neutral' | 'short', text: string) => (
+    <button
+      type="button"
+      onClick={() => setMode(value)}
+      aria-pressed={mode === value}
+      className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
+        mode === value ? 'bg-accent text-accent-text' : 'text-text-2 hover:bg-surface-3'
+      }`}
+    >
+      {text}
+    </button>
+  );
+
   return (
     <div className="flex flex-col gap-3">
       {showTitle && <p className="text-sm font-medium text-text-2">{strings.neutralTitle}</p>}
@@ -146,91 +189,64 @@ export default function ShareActions({
         className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-accent"
       />
 
-      <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 p-4">
-        <span className="text-xs text-text-3">{strings.yourLink}</span>
-        <code className="block break-all text-sm text-text">{neutralLink}</code>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => copy(neutralLink, 'neutral')}
-            className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-text hover:bg-accent-hover"
-          >
-            {copied === 'neutral' ? strings.copied : strings.copyNeutral}
-          </button>
-          {canShare() && (
-            <button
-              type="button"
-              onClick={() => share(neutralLink)}
-              className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-3"
-            >
-              {strings.shareButton}
-            </button>
-          )}
-        </div>
-        <QrCode value={neutralLink} />
+      <div className="flex gap-1 rounded-lg border border-border p-1">
+        {tab('neutral', strings.modeNeutral)}
+        {tab('short', strings.modeShort)}
       </div>
 
-      <div className="flex flex-col gap-2 border-t border-border pt-3">
-        {signedIn ? (
-          <>
-            {username ? (
-              <label className="flex items-center gap-1 text-sm text-text-2">
-                <span className="shrink-0 text-text-3">/x/{username}/</span>
-                <input
-                  value={customSlug}
-                  onChange={(e) => setCustomSlug(e.target.value)}
-                  placeholder={strings.customSlugPlaceholder}
-                  className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-sm text-text outline-none focus:border-accent"
-                />
+      {mode === 'neutral' ? (
+        linkPanel(neutralLink, strings.yourLink)
+      ) : shortLink ? (
+        <>
+          {linkPanel(shortLink, strings.yourShortLink)}
+          {shortNote && <p className="text-xs text-text-3">{shortNote}</p>}
+        </>
+      ) : (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4">
+          {signedIn ? (
+            <>
+              {username ? (
+                <label className="flex items-center gap-1 text-sm text-text-2">
+                  <span className="shrink-0 text-text-3">/x/{username}/</span>
+                  <input
+                    value={customSlug}
+                    onChange={(e) => setCustomSlug(e.target.value)}
+                    placeholder={strings.customSlugPlaceholder}
+                    className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-sm text-text outline-none focus:border-accent"
+                  />
+                </label>
+              ) : (
+                <a href={strings.accountHref} className="text-xs text-accent hover:underline">
+                  {strings.customSlugClaim}
+                </a>
+              )}
+              <label className="flex items-center gap-2 text-sm text-text-2">
+                {strings.expiry.label}
+                <select
+                  value={expiry}
+                  onChange={(e) => setExpiry(e.target.value as ExpiryToken)}
+                  className="rounded-md border border-border bg-surface px-2 py-1 text-sm text-text"
+                >
+                  {EXPIRY_TOKENS.map((tk) => (
+                    <option key={tk} value={tk}>
+                      {strings.expiry.options[tk]}
+                    </option>
+                  ))}
+                </select>
               </label>
-            ) : (
-              <a href={strings.accountHref} className="text-xs text-accent hover:underline">
-                {strings.customSlugClaim}
-              </a>
-            )}
-            <label className="flex items-center gap-2 text-sm text-text-2">
-              {strings.expiry.label}
-              <select
-                value={expiry}
-                onChange={(e) => setExpiry(e.target.value as ExpiryToken)}
-                className="rounded-md border border-border bg-surface px-2 py-1 text-sm text-text"
-              >
-                {EXPIRY_TOKENS.map((tk) => (
-                  <option key={tk} value={tk}>
-                    {strings.expiry.options[tk]}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </>
-        ) : (
-          <p className="text-xs text-text-3">{strings.anonNote}</p>
-        )}
-        <button
-          type="button"
-          onClick={saveShorten}
-          disabled={saving}
-          className="self-start rounded-lg border border-border px-4 py-2.5 font-medium text-text hover:bg-surface-2 disabled:opacity-60"
-        >
-          🔗 {strings.saveShorten}
-        </button>
-      </div>
-
-      {error && <p className="text-sm text-danger">{error}</p>}
-
-      {shortLink && (
-        <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 p-4">
-          <span className="text-xs text-text-3">{strings.yourShortLink}</span>
-          <code className="block break-all text-sm text-text">{shortLink}</code>
-          {shortNote && <span className="text-xs text-text-3">{shortNote}</span>}
+            </>
+          ) : (
+            <p className="text-xs text-text-3">{strings.anonNote}</p>
+          )}
           <button
             type="button"
-            onClick={() => copy(shortLink, 'short')}
-            className="self-start rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-text hover:bg-accent-hover"
+            onClick={createShort}
+            disabled={saving}
+            className="self-start rounded-lg bg-accent px-4 py-2.5 font-medium text-accent-text hover:bg-accent-hover disabled:opacity-60"
           >
-            {copied === 'short' ? strings.copied : strings.copy}
+            🔗 {strings.saveShorten}
           </button>
-          <QrCode value={shortLink} />
+          {error && <p className="text-sm text-danger">{error}</p>}
         </div>
       )}
     </div>

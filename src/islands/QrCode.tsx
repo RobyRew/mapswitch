@@ -26,7 +26,7 @@ export default function QrCode({ value, size = 168 }: { value: string; size?: nu
       width={size}
       height={size}
       alt="QR code"
-      className="self-start rounded-lg bg-white p-2"
+      className="rounded-lg bg-white p-2"
     />
   );
 }
