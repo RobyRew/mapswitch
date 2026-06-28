@@ -1,4 +1,4 @@
-import { t, type Locale } from './utils';
+import { t, path, type Locale } from './utils';
 import { EXPIRY_TOKENS, type ExpiryToken } from '@/lib/share/expiry';
 import type { ShareActionsStrings } from '@/islands/ShareActions';
 
@@ -35,6 +35,9 @@ export function shareActionsStrings(locale: Locale): ShareActionsStrings {
     copyNeutral: t(locale, 'chooser.share.copyNeutral'),
     shareButton: t(locale, 'chooser.share.shareButton'),
     qr: t(locale, 'chooser.share.qr'),
+    customSlugPlaceholder: t(locale, 'chooser.share.customSlugPlaceholder'),
+    customSlugClaim: t(locale, 'chooser.share.customSlugClaim'),
+    accountHref: path(locale, 'account'),
     copy: t(locale, 'share.copy'),
     copied: t(locale, 'share.copied'),
     saveShorten: t(locale, 'account.saveShorten'),

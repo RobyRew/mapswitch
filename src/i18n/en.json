@@ -33,7 +33,9 @@
       "copyNeutral": "Copy neutral link",
       "shareButton": "Share…",
       "qr": "QR",
-      "copyAppLink": "Copy link"
+      "copyAppLink": "Copy link",
+      "customSlugPlaceholder": "custom-name (optional)",
+      "customSlugClaim": "Claim a username to make custom links →"
     }
   },
   "share": {
@@ -58,7 +60,9 @@
     "openingIn": "Opening in {{app}}…",
     "openNow": "Open now",
     "chooseDifferent": "Choose a different app",
-    "noLocation": "This link has no location in it."
+    "noLocation": "This link has no location in it.",
+    "savePlace": "Save to my places",
+    "saved": "Saved"
   },
   "manager": {
     "defaultLabel": "Default app",
@@ -153,6 +157,16 @@
     "weeklyLimit": "Weekly limit reached (20 anonymous links per 7 days). Sign in for more.",
     "accountLimit": "You've reached 1000 saved links — please contact me to raise the limit.",
     "permanent": "permanent",
-    "expires": "expires"
+    "expires": "expires",
+    "usernameLabel": "Username",
+    "usernameHelp": "Pick a username for custom links like /x/you/casa. Lowercase letters, numbers, - or _ (can't be changed later).",
+    "usernamePlaceholder": "your-handle",
+    "usernameClaim": "Claim",
+    "usernameTaken": "That username is taken.",
+    "usernameInvalid": "3–30 characters: letters, numbers, - or _.",
+    "savedPlaces": "Saved places",
+    "recentlyOpened": "Recently opened",
+    "placesEmpty": "Nothing here yet.",
+    "open": "Open"
   }
 }

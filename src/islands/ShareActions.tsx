@@ -15,6 +15,9 @@ export interface ShareActionsStrings {
   copyNeutral: string;
   shareButton: string;
   qr: string;
+  customSlugPlaceholder: string;
+  customSlugClaim: string;
+  accountHref: string;
   copy: string;
   copied: string;
   saveShorten: string;
@@ -52,11 +55,28 @@ export default function ShareActions({
   const [copied, setCopied] = useState<'neutral' | 'short' | null>(null);
   const [qrOf, setQrOf] = useState<'neutral' | 'short' | null>(null);
   const [name, setName] = useState(target.label ?? '');
+  const [customSlug, setCustomSlug] = useState('');
+  const [username, setUsername] = useState<string | null>(null);
 
   // Preselect the user's default expiry once prefs load.
   useEffect(() => {
     if (loaded) setExpiry(prefs.defaultExpiry);
   }, [loaded, prefs.defaultExpiry]);
+
+  // Learn the account's username (for vanity /x/<username>/<slug> links).
+  useEffect(() => {
+    if (!signedIn) return;
+    let alive = true;
+    fetch('/api/username')
+      .then((r) => r.json())
+      .then((d: { username?: string | null }) => {
+        if (alive) setUsername(d.username ?? null);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [signedIn]);
 
   // Re-sync the editable name when a different place is resolved.
   useEffect(() => setName(target.label ?? ''), [target.lat, target.lng, target.label]);
@@ -95,6 +115,7 @@ export default function ShareActions({
         const mins = expiryMinutes(expiry);
         if (mins === null) body.indefinite = true;
         else body.expiresInMinutes = mins;
+        if (username && customSlug.trim()) body.customSlug = customSlug.trim();
       } else {
         body.anonId = getAnonId();
       }
@@ -162,20 +183,37 @@ export default function ShareActions({
 
       <div className="flex flex-col gap-2 border-t border-border pt-3">
         {signedIn ? (
-          <label className="flex items-center gap-2 text-sm text-text-2">
-            {strings.expiry.label}
-            <select
-              value={expiry}
-              onChange={(e) => setExpiry(e.target.value as ExpiryToken)}
-              className="rounded-md border border-border bg-surface px-2 py-1 text-sm text-text"
-            >
-              {EXPIRY_TOKENS.map((tk) => (
-                <option key={tk} value={tk}>
-                  {strings.expiry.options[tk]}
-                </option>
-              ))}
-            </select>
-          </label>
+          <>
+            {username ? (
+              <label className="flex items-center gap-1 text-sm text-text-2">
+                <span className="shrink-0 text-text-3">/x/{username}/</span>
+                <input
+                  value={customSlug}
+                  onChange={(e) => setCustomSlug(e.target.value)}
+                  placeholder={strings.customSlugPlaceholder}
+                  className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-sm text-text outline-none focus:border-accent"
+                />
+              </label>
+            ) : (
+              <a href={strings.accountHref} className="text-xs text-accent hover:underline">
+                {strings.customSlugClaim}
+              </a>
+            )}
+            <label className="flex items-center gap-2 text-sm text-text-2">
+              {strings.expiry.label}
+              <select
+                value={expiry}
+                onChange={(e) => setExpiry(e.target.value as ExpiryToken)}
+                className="rounded-md border border-border bg-surface px-2 py-1 text-sm text-text"
+              >
+                {EXPIRY_TOKENS.map((tk) => (
+                  <option key={tk} value={tk}>
+                    {strings.expiry.options[tk]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
         ) : (
           <p className="text-xs text-text-3">{strings.anonNote}</p>
         )}

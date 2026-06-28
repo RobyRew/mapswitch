@@ -4,6 +4,7 @@ export interface SessionUser {
   id: string;
   email: string;
   name: string;
+  username: string | null;
   emailVerified: boolean;
 }
 
@@ -34,6 +35,7 @@ export async function getUser(request: Request): Promise<SessionUser | null> {
       id: u.id,
       email: u.email ?? '',
       name: u.name ?? '',
+      username: u.username ?? null,
       emailVerified: !!u.emailVerified,
     };
   } catch (err) {

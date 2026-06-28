@@ -88,3 +88,55 @@ describe('drizzle store — preferences', () => {
     expect(await store.preferences.get('u1')).toEqual({ defaultProviderId: 'waze', autoOpen: true });
   });
 });
+
+describe('drizzle store — usernames', () => {
+  it('claims + looks up a username', async () => {
+    expect(await store.users.usernameTaken('robyrew')).toBe(false);
+    await store.users.setUsername('u1', 'robyrew');
+    expect(await store.users.getUsername('u1')).toBe('robyrew');
+    expect(await store.users.idByUsername('robyrew')).toBe('u1');
+    expect(await store.users.usernameTaken('robyrew')).toBe(true);
+  });
+
+  it('rejects a duplicate username (unique index)', async () => {
+    await expect(store.users.setUsername('u2', 'robyrew')).rejects.toThrow();
+  });
+});
+
+describe('drizzle store — custom (vanity) slugs', () => {
+  it('creates a per-user vanity slug and resolves it', async () => {
+    await store.links.create({ slug: 'rnd001', userId: 'u1', lat: 41.1, lng: 1.2, label: 'Casa', customSlug: 'lacasaquebaila' });
+    expect(await store.links.customSlugTaken('u1', 'lacasaquebaila')).toBe(true);
+    expect(await store.links.getByUserCustomSlug('u1', 'lacasaquebaila')).toMatchObject({
+      slug: 'rnd001',
+      customSlug: 'lacasaquebaila',
+      lat: 41.1,
+      lng: 1.2,
+    });
+    // A different user is a separate namespace.
+    expect(await store.links.customSlugTaken('u2', 'lacasaquebaila')).toBe(false);
+  });
+
+  it('lets two users share the same vanity slug', async () => {
+    await store.links.create({ slug: 'rnd002', userId: 'u2', lat: 5, lng: 6, customSlug: 'lacasaquebaila' });
+    expect((await store.links.getByUserCustomSlug('u2', 'lacasaquebaila'))?.slug).toBe('rnd002');
+  });
+});
+
+describe('drizzle store — places (saved / opened)', () => {
+  it('saves, de-dupes by spot, lists and deletes', async () => {
+    await store.places.add({ userId: 'u1', lat: 1.5, lng: 2.5, label: 'A', kind: 'saved' });
+    await store.places.add({ userId: 'u1', lat: 1.5, lng: 2.5, label: 'A again', kind: 'saved' });
+    const saved = await store.places.listByUser('u1', 'saved');
+    expect(saved.length).toBe(1);
+    expect(saved[0]!.label).toBe('A again');
+    expect(await store.places.delete(saved[0]!.id, 'u1')).toBe(true);
+    expect((await store.places.listByUser('u1', 'saved')).length).toBe(0);
+  });
+
+  it('prunes the opened list to the cap', async () => {
+    for (let i = 0; i < 5; i++) await store.places.add({ userId: 'u2', lat: i, lng: i, kind: 'opened' });
+    await store.places.pruneOpened('u2', 3);
+    expect((await store.places.listByUser('u2', 'opened')).length).toBe(3);
+  });
+});

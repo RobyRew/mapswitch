@@ -1,8 +1,8 @@
-import { eq, and, or, gt, lt, desc, sql, isNull, isNotNull } from 'drizzle-orm';
+import { eq, and, or, gt, lt, desc, sql, isNull, isNotNull, notInArray } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { getDb, type DB } from './client';
-import { preferences, savedLinks, linkHistory } from './schema';
-import type { Store, SavedLink, NewLink } from './store';
+import { preferences, savedLinks, linkHistory, users, places } from './schema';
+import type { Store, SavedLink, NewLink, Place, NewPlace, PlaceKind } from './store';
 
 type LinkRow = typeof savedLinks.$inferSelect;
 
@@ -15,6 +15,7 @@ function rowToLink(r: LinkRow): SavedLink {
     lat: r.lat,
     lng: r.lng,
     label: r.label ?? undefined,
+    customSlug: r.customSlug ?? null,
     createdAt: r.createdAt.getTime(),
     expiresAt: r.expiresAt ? r.expiresAt.getTime() : null,
     hitCount: r.hitCount,
@@ -52,6 +53,36 @@ export function createDrizzleStore(db: DB = getDb()): Store {
       },
     },
 
+    users: {
+      async getUsername(userId) {
+        const [row] = await db
+          .select({ username: users.username })
+          .from(users)
+          .where(eq(users.id, userId))
+          .limit(1);
+        return row?.username ?? null;
+      },
+      async setUsername(userId, username) {
+        // The unique index enforces global uniqueness; a clash throws (caller handles).
+        await db.update(users).set({ username }).where(eq(users.id, userId));
+      },
+      async idByUsername(username) {
+        const [row] = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.username, username))
+          .limit(1);
+        return row?.id ?? null;
+      },
+      async usernameTaken(username) {
+        const [row] = await db
+          .select({ c: sql<number>`count(*)` })
+          .from(users)
+          .where(eq(users.username, username));
+        return (row?.c ?? 0) > 0;
+      },
+    },
+
     links: {
       async create(link: NewLink) {
         const row: LinkRow = {
@@ -62,6 +93,7 @@ export function createDrizzleStore(db: DB = getDb()): Store {
           lat: link.lat,
           lng: link.lng,
           label: link.label ?? null,
+          customSlug: link.customSlug ?? null,
           createdAt: new Date(),
           expiresAt: link.expiresAt ? new Date(link.expiresAt) : null,
           hitCount: 0,
@@ -72,6 +104,21 @@ export function createDrizzleStore(db: DB = getDb()): Store {
       async get(slug) {
         const [row] = await db.select().from(savedLinks).where(eq(savedLinks.slug, slug)).limit(1);
         return row ? rowToLink(row) : null;
+      },
+      async getByUserCustomSlug(userId, customSlug) {
+        const [row] = await db
+          .select()
+          .from(savedLinks)
+          .where(and(eq(savedLinks.userId, userId), eq(savedLinks.customSlug, customSlug)))
+          .limit(1);
+        return row ? rowToLink(row) : null;
+      },
+      async customSlugTaken(userId, customSlug) {
+        const [row] = await db
+          .select({ c: sql<number>`count(*)` })
+          .from(savedLinks)
+          .where(and(eq(savedLinks.userId, userId), eq(savedLinks.customSlug, customSlug)));
+        return (row?.c ?? 0) > 0;
       },
       async listByUser(userId) {
         const rows = await db
@@ -131,6 +178,74 @@ export function createDrizzleStore(db: DB = getDb()): Store {
           .delete(savedLinks)
           .where(and(isNotNull(savedLinks.expiresAt), lt(savedLinks.expiresAt, new Date(nowMs))));
         return res.changes ?? 0;
+      },
+    },
+
+    places: {
+      async add(p: NewPlace) {
+        // De-dupe: a place at the same spot collapses to a single, most-recent row.
+        await db
+          .delete(places)
+          .where(
+            and(
+              eq(places.userId, p.userId),
+              eq(places.kind, p.kind),
+              eq(places.lat, p.lat),
+              eq(places.lng, p.lng),
+            ),
+          );
+        const createdAt = new Date();
+        const id = nanoid();
+        await db.insert(places).values({
+          id,
+          userId: p.userId,
+          lat: p.lat,
+          lng: p.lng,
+          label: p.label ?? null,
+          kind: p.kind,
+          createdAt,
+        });
+        return { id, lat: p.lat, lng: p.lng, label: p.label, kind: p.kind, createdAt: createdAt.getTime() };
+      },
+      async listByUser(userId, kind, limit = 100) {
+        const rows = await db
+          .select()
+          .from(places)
+          .where(and(eq(places.userId, userId), eq(places.kind, kind)))
+          .orderBy(desc(places.createdAt))
+          .limit(limit);
+        return rows.map(
+          (r): Place => ({
+            id: r.id,
+            lat: r.lat,
+            lng: r.lng,
+            label: r.label ?? undefined,
+            kind: r.kind as PlaceKind,
+            createdAt: r.createdAt.getTime(),
+          }),
+        );
+      },
+      async delete(id, userId) {
+        const res = await db.delete(places).where(and(eq(places.id, id), eq(places.userId, userId)));
+        return (res.changes ?? 0) > 0;
+      },
+      async pruneOpened(userId, keep) {
+        const keepRows = await db
+          .select({ id: places.id })
+          .from(places)
+          .where(and(eq(places.userId, userId), eq(places.kind, 'opened')))
+          .orderBy(desc(places.createdAt))
+          .limit(keep);
+        const keepIds = keepRows.map((r) => r.id);
+        await db
+          .delete(places)
+          .where(
+            and(
+              eq(places.userId, userId),
+              eq(places.kind, 'opened'),
+              keepIds.length ? notInArray(places.id, keepIds) : undefined,
+            ),
+          );
       },
     },
 

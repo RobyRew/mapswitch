@@ -1,18 +1,23 @@
-import { sqliteTable, text, integer, real, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 // ── Identity ────────────────────────────────────────────────────────────────
 // Logto owns authentication (passwords, social, passkeys, MFA, email). The app
 // keeps only a thin local row keyed by the Logto subject (`sub`) — the canonical
 // user id across every service. App data FKs to `users.id`, never to an email or
 // provider id. See docs/auth-logto.md.
-export const users = sqliteTable('users', {
-  id: text('id').primaryKey(), // app-side id (nanoid)
-  logtoSub: text('logto_sub').notNull().unique(), // Logto subject — the link to identity
-  email: text('email'), // cached from the ID token; may go stale
-  name: text('name'),
-  emailVerified: integer('emailVerified', { mode: 'boolean' }).notNull().default(false),
-  createdAt: integer('createdAt').notNull(), // Date.now() ms
-});
+export const users = sqliteTable(
+  'users',
+  {
+    id: text('id').primaryKey(), // app-side id (nanoid)
+    logtoSub: text('logto_sub').notNull().unique(), // Logto subject — the link to identity
+    email: text('email'), // cached from the ID token; may go stale
+    name: text('name'),
+    username: text('username'), // public handle for /x/<username>/<slug> (claimed in-app)
+    emailVerified: integer('emailVerified', { mode: 'boolean' }).notNull().default(false),
+    createdAt: integer('createdAt').notNull(), // Date.now() ms
+  },
+  (t) => [uniqueIndex('users_username_unique').on(t.username)],
+);
 
 // Server-side Logto session store. The browser holds only an opaque `ms_sid`
 // cookie; the OIDC tokens live here (never in browser JS). `data` is the JSON
@@ -44,6 +49,7 @@ export const savedLinks = sqliteTable(
     lat: real('lat').notNull(),
     lng: real('lng').notNull(),
     label: text('label'),
+    customSlug: text('customSlug'), // optional vanity slug, unique per user → /x/<username>/<customSlug>
     createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
     expiresAt: integer('expiresAt', { mode: 'timestamp' }),
     hitCount: integer('hitCount').notNull().default(0),
@@ -52,7 +58,27 @@ export const savedLinks = sqliteTable(
     index('saved_links_user_idx').on(t.userId),
     index('saved_links_owner_idx').on(t.ownerToken),
     index('saved_links_iphash_idx').on(t.ipHash),
+    // Per-user uniqueness for vanity slugs (NULLs are distinct, so plain links don't clash).
+    uniqueIndex('saved_links_user_custom_idx').on(t.userId, t.customSlug),
   ],
+);
+
+// Places a signed-in user keeps: explicitly saved (kind='saved') or auto-recorded
+// when they open a MapSwitch link (kind='opened'). Powers "shared with me".
+export const places = sqliteTable(
+  'places',
+  {
+    id: text('id').primaryKey(),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    lat: real('lat').notNull(),
+    lng: real('lng').notNull(),
+    label: text('label'),
+    kind: text('kind').notNull(), // 'saved' | 'opened'
+    createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
+  },
+  (t) => [index('places_user_kind_idx').on(t.userId, t.kind, t.createdAt)],
 );
 
 export const linkHistory = sqliteTable(

@@ -6,19 +6,24 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import OpenHandler from '@/islands/OpenHandler';
 import { getStore } from '@/lib/db';
 import type { Match } from '@/lib/providers/types';
+import { normalizeUsername, normalizeSlug } from '@/lib/share/slug';
 
-const slug = Astro.params.slug ?? '';
+const username = normalizeUsername(Astro.params.username ?? '');
+const slug = normalizeSlug(Astro.params.slug ?? '');
 const store = getStore();
 
 let match: Match | null = null;
-if (/^[A-Za-z0-9_-]{6,16}$/.test(slug) && store) {
-  const link = await store.links.get(slug);
-  if (link && (!link.expiresAt || link.expiresAt > Date.now())) {
-    await store.links.incrementHit(slug);
-    match = { lat: link.lat, lng: link.lng, label: link.label, source: 'slug' };
+if (username && slug && store) {
+  const userId = await store.users.idByUsername(username);
+  if (userId) {
+    const link = await store.links.getByUserCustomSlug(userId, slug);
+    if (link && (!link.expiresAt || link.expiresAt > Date.now())) {
+      await store.links.incrementHit(link.slug);
+      match = { lat: link.lat, lng: link.lng, label: link.label, source: 'slug' };
+    }
   }
 }
-Astro.response.status = match ? 200 : 404; // 404 for missing/expired slugs
+Astro.response.status = match ? 200 : 404; // 404 for missing/expired vanity links
 
 const langParam = Astro.url.searchParams.get('lang') ?? undefined;
 const locale: Locale = isLocale(langParam) ? langParam : DEFAULT_LOCALE;

@@ -3,8 +3,10 @@ export const prerender = false;
 import { isLocale, type Locale, t } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AccountPanel from '@/islands/AccountPanel';
+import UsernameClaim from '@/islands/UsernameClaim';
 import DefaultAppManager from '@/islands/DefaultAppManager';
 import HistoryList from '@/islands/HistoryList';
+import PlacesList from '@/islands/PlacesList';
 import { getUser } from '@/lib/auth/session';
 
 const { lang } = Astro.params;
@@ -34,6 +36,22 @@ const historyStrings = {
   permanent: t(locale, 'account.permanent'),
   expires: t(locale, 'account.expires'),
 };
+const usernameStrings = {
+  label: t(locale, 'account.usernameLabel'),
+  help: t(locale, 'account.usernameHelp'),
+  placeholder: t(locale, 'account.usernamePlaceholder'),
+  claim: t(locale, 'account.usernameClaim'),
+  taken: t(locale, 'account.usernameTaken'),
+  invalid: t(locale, 'account.usernameInvalid'),
+  error: t(locale, 'account.genericError'),
+};
+const placesStrings = {
+  savedTitle: t(locale, 'account.savedPlaces'),
+  openedTitle: t(locale, 'account.recentlyOpened'),
+  empty: t(locale, 'account.placesEmpty'),
+  open: t(locale, 'account.open'),
+  delete: t(locale, 'account.delete'),
+};
 const base = import.meta.env.PUBLIC_SITE_URL || Astro.url.origin;
 ---
 
@@ -41,7 +59,9 @@ const base = import.meta.env.PUBLIC_SITE_URL || Astro.url.origin;
   <section class="flex flex-col gap-6">
     <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'account.myAccount')}</h1>
     <AccountPanel client:load email={user.email} strings={accountStrings} signOutPath="/api/auth/sign-out" />
+    <UsernameClaim client:load strings={usernameStrings} />
     <DefaultAppManager client:load strings={managerStrings} />
     <HistoryList client:load strings={historyStrings} baseUrl={base} />
+    <PlacesList client:load strings={placesStrings} />
   </section>
 </BaseLayout>

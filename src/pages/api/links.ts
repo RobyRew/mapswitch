@@ -7,6 +7,7 @@ import { readJson, HttpError } from '@/lib/http/guard';
 import { rateLimit } from '@/lib/ratelimit/tokenBucket';
 import { clientIp, hashIp } from '@/lib/http/ip';
 import { isValidLatLng, roundCoord } from '@/lib/parse/coords';
+import { normalizeSlug, isValidSlug } from '@/lib/share/slug';
 
 export const prerender = false;
 
@@ -23,6 +24,7 @@ const Body = z.object({
   expiresInMinutes: z.number().int().min(1).max(1_051_200).optional(),
   expiresInDays: z.number().int().min(1).max(3650).optional(),
   indefinite: z.boolean().optional(),
+  customSlug: z.string().max(60).optional(),
 });
 
 function json(data: unknown, status = 200): Response {
@@ -65,7 +67,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
   const parsed = Body.safeParse(raw);
   if (!parsed.success) return json({ error: 'invalid_input' }, 400);
-  const { lat, lng, label, anonId, expiresInMinutes, expiresInDays, indefinite } = parsed.data;
+  const { lat, lng, label, anonId, expiresInMinutes, expiresInDays, indefinite, customSlug } = parsed.data;
   if (!isValidLatLng(lat, lng)) return json({ error: 'invalid_coords' }, 400);
 
   await store.links.pruneExpired(Date.now()); // opportunistic cleanup
@@ -74,9 +76,17 @@ export const POST: APIRoute = async ({ request }) => {
   let ownerToken: string | null = null;
   let ipHash: string | null = null;
   let expiresAt: number | null;
+  let vanity: string | null = null; // validated custom slug (signed-in only)
 
   if (user) {
     userId = user.id;
+    // Vanity slug → /x/<username>/<slug>. Requires a claimed username.
+    if (customSlug && customSlug.trim()) {
+      if (!user.username) return json({ error: 'username_required' }, 409);
+      vanity = normalizeSlug(customSlug);
+      if (!isValidSlug(vanity)) return json({ error: 'invalid_slug' }, 400);
+      if (await store.links.customSlugTaken(user.id, vanity)) return json({ error: 'slug_taken' }, 409);
+    }
     if ((await store.links.countByUser(user.id)) >= MAX_SLUGS) return json({ error: 'limit_reached' }, 409);
     const rl = rateLimit(`links:${user.id}`);
     if (!rl.ok) {
@@ -120,10 +130,12 @@ export const POST: APIRoute = async ({ request }) => {
     lat: roundCoord(lat),
     lng: roundCoord(lng),
     label,
+    customSlug: vanity,
     expiresAt,
   });
   if (userId) await store.history.add(userId, slug);
 
   const origin = process.env.PUBLIC_SITE_URL || new URL(request.url).origin;
-  return json({ slug, url: `${origin}/x/${slug}`, expiresAt });
+  const url = vanity && user?.username ? `${origin}/x/${user.username}/${vanity}` : `${origin}/x/${slug}`;
+  return json({ slug, url, expiresAt });
 };

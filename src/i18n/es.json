@@ -33,7 +33,9 @@
       "copyNeutral": "Copiar enlace neutral",
       "shareButton": "Compartir…",
       "qr": "QR",
-      "copyAppLink": "Copiar enlace"
+      "copyAppLink": "Copiar enlace",
+      "customSlugPlaceholder": "nombre-personalizado (opcional)",
+      "customSlugClaim": "Reclama un nombre de usuario para enlaces personalizados →"
     }
   },
   "share": {
@@ -58,7 +60,9 @@
     "openingIn": "Abriendo en {{app}}…",
     "openNow": "Abrir ahora",
     "chooseDifferent": "Elegir otra app",
-    "noLocation": "Este enlace no contiene ninguna ubicación."
+    "noLocation": "Este enlace no contiene ninguna ubicación.",
+    "savePlace": "Guardar en mis lugares",
+    "saved": "Guardado"
   },
   "manager": {
     "defaultLabel": "App por defecto",
@@ -153,6 +157,16 @@
     "weeklyLimit": "Límite semanal alcanzado (20 enlaces anónimos por 7 días). Inicia sesión para más.",
     "accountLimit": "Has alcanzado 1000 enlaces guardados — contáctame para ampliarlo.",
     "permanent": "permanente",
-    "expires": "caduca"
+    "expires": "caduca",
+    "usernameLabel": "Nombre de usuario",
+    "usernameHelp": "Elige un nombre de usuario para enlaces personalizados como /x/tu/casa. Minúsculas, números, - o _ (no se puede cambiar después).",
+    "usernamePlaceholder": "tu-nombre",
+    "usernameClaim": "Reclamar",
+    "usernameTaken": "Ese nombre de usuario ya está cogido.",
+    "usernameInvalid": "3–30 caracteres: letras, números, - o _.",
+    "savedPlaces": "Lugares guardados",
+    "recentlyOpened": "Abiertos recientemente",
+    "placesEmpty": "Aún no hay nada aquí.",
+    "open": "Abrir"
   }
 }
