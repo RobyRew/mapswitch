@@ -121,18 +121,15 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
       return;
     }
     setLocating(true);
-    const t0 = Date.now();
 
     const onOk = (pos: GeolocationPosition) => {
-      const { latitude, longitude, accuracy } = pos.coords;
-      console.info('[geo] success', { accuracy, ms: Date.now() - t0 });
+      const { latitude, longitude } = pos.coords;
       setValue(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
       setApprox(false);
       setMatch({ lat: roundCoord(latitude), lng: roundCoord(longitude), source: 'coords' });
       setLocating(false);
     };
     const onErr = (err: GeolocationPositionError, retried: boolean) => {
-      console.warn('[geo] error', { code: err.code, message: err.message, retried });
       if (!retried && err.code === err.TIMEOUT) {
         navigator.geolocation.getCurrentPosition(onOk, (e) => onErr(e, true), {
           enableHighAccuracy: false,

@@ -5,7 +5,6 @@
   },
   "nav": {
     "home": "Home",
-    "share": "Share a place",
     "settings": "Settings",
     "privacy": "Privacy",
     "about": "About",
@@ -14,9 +13,7 @@
   },
   "home": {
     "title": "Open or share any place",
-    "subtitle": "Paste a map link, coordinates, a Plus Code or a place name — or use your location. Open it in the app you like, or share a neutral link others open in theirs.",
-    "receiverTitle": "I got a map link",
-    "shareTitle": "Share a place instead"
+    "subtitle": "Paste a map link, coordinates, a Plus Code or a place name — or use your location. Open it in the app you like, or share a neutral link others open in theirs."
   },
   "paste": {
     "placeholder": "Paste a map link, \"lat, lng\", a Plus Code or a place name…",

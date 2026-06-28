@@ -5,7 +5,6 @@
   },
   "nav": {
     "home": "Inicio",
-    "share": "Compartir un lugar",
     "settings": "Ajustes",
     "privacy": "Privacidad",
     "about": "Acerca de",
@@ -14,9 +13,7 @@
   },
   "home": {
     "title": "Abre o comparte cualquier lugar",
-    "subtitle": "Pega un enlace de mapas, coordenadas, un Plus Code o un nombre de lugar — o usa tu ubicación. Ábrelo en la app que quieras o comparte un enlace neutro que cada uno abre en la suya.",
-    "receiverTitle": "Me han pasado un enlace",
-    "shareTitle": "Mejor compartir un lugar"
+    "subtitle": "Pega un enlace de mapas, coordenadas, un Plus Code o un nombre de lugar — o usa tu ubicación. Ábrelo en la app que quieras o comparte un enlace neutro que cada uno abre en la suya."
   },
   "paste": {
     "placeholder": "Pega un enlace de mapas, \"lat, lng\", un Plus Code o un nombre de lugar…",

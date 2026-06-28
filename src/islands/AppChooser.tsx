@@ -31,10 +31,8 @@ export default function AppChooser({ match, platform, strings }: Props) {
   const options = useMemo(() => buildForRegistry(match, platform), [match, platform]);
   const showRadarbotHint = platform === 'ios' && options.some((o) => o.id === 'radarbot' && o.available);
 
-  function pick(id: string, href: string | null) {
-    if (!href) return;
+  function remembered(id: string) {
     if (remember) update({ defaultProviderId: id, autoOpen: true });
-    window.location.href = href;
   }
 
   async function copyApp(id: string, href: string) {
@@ -65,18 +63,28 @@ export default function AppChooser({ match, platform, strings }: Props) {
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {options.map((o) => (
             <div key={o.id} className="relative">
-              <button
-                type="button"
-                disabled={!o.available}
-                onClick={() => pick(o.id, o.href)}
-                className={`flex w-full items-center justify-center gap-2 rounded-lg border border-border px-3 py-3 text-sm font-medium transition ${
-                  o.available ? 'bg-surface hover:bg-surface-2 active:scale-[0.98]' : 'cursor-not-allowed opacity-40'
-                }`}
-              >
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: o.color ?? '#8e8e93' }} />
-                <span className="truncate">{o.name}</span>
-                {!o.available && <span className="text-[10px] text-text-3">{strings.unavailable}</span>}
-              </button>
+              {o.href ? (
+                <a
+                  href={o.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => remembered(o.id)}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-3 text-sm font-medium transition hover:bg-surface-2 active:scale-[0.98]"
+                >
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: o.color ?? '#8e8e93' }} />
+                  <span className="truncate">{o.name}</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-border px-3 py-3 text-sm font-medium opacity-40"
+                >
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: o.color ?? '#8e8e93' }} />
+                  <span className="truncate">{o.name}</span>
+                  <span className="text-[10px] text-text-3">{strings.unavailable}</span>
+                </button>
+              )}
               {o.href && (
                 <button
                   type="button"

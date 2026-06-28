@@ -17,7 +17,9 @@ function json(data: unknown, status = 200): Response {
 
 export const GET: APIRoute = async ({ request }) => {
   const user = await getUser(request);
-  if (!user) return json({ error: 'unauthorized' }, 401);
+  // Anonymous users keep prefs in localStorage only — answer 200 with no prefs
+  // (a 401 here is harmless but shows up as a console error in the browser).
+  if (!user) return json({ preferences: null });
   const store = getStore();
   if (!store) return json({ error: 'unavailable' }, 503);
   return json({ preferences: await store.preferences.get(user.id) });
@@ -25,7 +27,7 @@ export const GET: APIRoute = async ({ request }) => {
 
 export const PUT: APIRoute = async ({ request }) => {
   const user = await getUser(request);
-  if (!user) return json({ error: 'unauthorized' }, 401);
+  if (!user) return json({ ok: false }); // anon: no-op (prefs stay local)
   const store = getStore();
   if (!store) return json({ error: 'unavailable' }, 503);
 
