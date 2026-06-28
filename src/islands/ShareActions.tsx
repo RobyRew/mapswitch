@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { buildShareUrl } from '@/lib/share/encode';
 import type { BuildTarget } from '@/lib/providers/types';
 import { getAnonId } from './hooks/useAnonId';
@@ -6,6 +6,7 @@ import { useSignedIn } from './hooks/useSignedIn';
 
 export interface ShareActionsStrings {
   neutralTitle: string;
+  namePlaceholder: string;
   yourLink: string;
   copyNeutral: string;
   shareButton: string;
@@ -49,9 +50,14 @@ export default function ShareActions({
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState<'neutral' | 'short' | null>(null);
+  const [name, setName] = useState(target.label ?? '');
+
+  // Re-sync the editable name when a different place is resolved.
+  useEffect(() => setName(target.label ?? ''), [target.lat, target.lng, target.label]);
 
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const neutralLink = buildShareUrl(origin, target);
+  const effective = { ...target, label: name.trim() || undefined };
+  const neutralLink = buildShareUrl(origin, effective);
 
   async function copy(value: string, which: 'neutral' | 'short') {
     try {
@@ -64,7 +70,7 @@ export default function ShareActions({
 
   async function share(value: string) {
     try {
-      await navigator.share({ url: value, title: target.label || 'MapSwitch' });
+      await navigator.share({ url: value, title: effective.label || 'MapSwitch' });
     } catch {
       /* user cancelled or unsupported */
     }
@@ -77,7 +83,7 @@ export default function ShareActions({
     setShortNote(null);
     setSaving(true);
     try {
-      const body: Record<string, unknown> = { lat: target.lat, lng: target.lng, label: target.label };
+      const body: Record<string, unknown> = { lat: target.lat, lng: target.lng, label: effective.label };
       if (signedIn) {
         if (expiry === 'indefinite') body.indefinite = true;
         else body.expiresInDays = Number(expiry);
@@ -106,6 +112,13 @@ export default function ShareActions({
   return (
     <div className="flex flex-col gap-3">
       {showTitle && <p className="text-sm font-medium text-text-2">{strings.neutralTitle}</p>}
+
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder={strings.namePlaceholder}
+        className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-accent"
+      />
 
       <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 p-4">
         <span className="text-xs text-text-3">{strings.yourLink}</span>

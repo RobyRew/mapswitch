@@ -13,13 +13,13 @@
     "use": "Enlaces y API"
   },
   "home": {
-    "title": "Abre cualquier enlace de mapas en tu app",
-    "subtitle": "Pega un enlace de Google, Apple, Waze o Yandex —o coordenadas, o un Plus Code— y elige la app que quieras. O crea un enlace neutro que otros puedan abrir en su propia app.",
+    "title": "Abre o comparte cualquier lugar",
+    "subtitle": "Pega un enlace de mapas, coordenadas, un Plus Code o un nombre de lugar — o usa tu ubicación. Ábrelo en la app que quieras o comparte un enlace neutro que cada uno abre en la suya.",
     "receiverTitle": "Me han pasado un enlace",
     "shareTitle": "Mejor compartir un lugar"
   },
   "paste": {
-    "placeholder": "Pega un enlace de mapas, \"lat, lng\" o un Plus Code…",
+    "placeholder": "Pega un enlace de mapas, \"lat, lng\", un Plus Code o un nombre de lugar…",
     "resolve": "Buscar lugar",
     "resolving": "Resolviendo…",
     "paste": "Pegar",

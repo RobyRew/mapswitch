@@ -12,8 +12,8 @@
     "use": "Linkuri și API"
   },
   "home": {
-    "title": "Deschide orice link de hărți în aplicația ta",
-    "subtitle": "Lipește un link Google, Apple, Waze sau Yandex — sau coordonate, sau un Plus Code — și alege aplicația dorită."
+    "title": "Deschide sau partajează orice loc",
+    "subtitle": "Lipește un link de hărți, coordonate, un Plus Code sau un nume de loc — sau folosește locația ta. Deschide-l în aplicația dorită sau partajează un link neutru pe care fiecare îl deschide în a sa."
   },
   "chooser": {
     "openIn": "Deschide în…",

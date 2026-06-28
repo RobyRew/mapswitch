@@ -46,8 +46,20 @@ export default function AppChooser({ match, platform, strings }: Props) {
     }
   }
 
+  const placeName = match.label?.trim();
+
   return (
     <div className="flex flex-col gap-4">
+      <p className="flex items-baseline gap-2 text-text">
+        <span aria-hidden="true">📍</span>
+        <span className="min-w-0">
+          {placeName && <span className="font-medium">{placeName}</span>}
+          <span className={`block text-xs text-text-3 ${placeName ? '' : 'text-sm text-text'}`}>
+            {match.lat}, {match.lng}
+          </span>
+        </span>
+      </p>
+
       <div className="flex flex-col gap-3">
         <p className="text-sm font-medium text-text-2">{strings.openIn}</p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">

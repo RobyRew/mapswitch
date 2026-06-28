@@ -5,6 +5,7 @@ import type { ShareActionsStrings } from '@/islands/ShareActions';
 export function shareActionsStrings(locale: Locale): ShareActionsStrings {
   return {
     neutralTitle: t(locale, 'chooser.share.neutralTitle'),
+    namePlaceholder: t(locale, 'share.labelPlaceholder'),
     yourLink: t(locale, 'share.yourLink'),
     copyNeutral: t(locale, 'chooser.share.copyNeutral'),
     shareButton: t(locale, 'chooser.share.shareButton'),

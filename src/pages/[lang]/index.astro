@@ -4,7 +4,6 @@ import { LOCALES, isLocale, type Locale, t } from '@/i18n/utils';
 import { shareActionsStrings } from '@/i18n/strings';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PasteBox from '@/islands/PasteBox';
-import ShareLinkGenerator from '@/islands/ShareLinkGenerator';
 
 export function getStaticPaths() {
   return LOCALES.map((lang) => ({ params: { lang } }));
@@ -19,6 +18,13 @@ const pasteStrings = {
   resolving: t(locale, 'paste.resolving'),
   paste: t(locale, 'paste.paste'),
   error: t(locale, 'paste.error'),
+  useLocation: t(locale, 'share.useLocation'),
+  locating: t(locale, 'share.locating'),
+  locationDenied: t(locale, 'share.locationDenied'),
+  locationUnavailable: t(locale, 'share.locationUnavailable'),
+  locationTimeout: t(locale, 'share.locationTimeout'),
+  locationUnsupported: t(locale, 'share.locationUnsupported'),
+  approxLocation: t(locale, 'share.approxLocation'),
   chooser: {
     openIn: t(locale, 'chooser.openIn'),
     remember: t(locale, 'chooser.remember'),
@@ -30,38 +36,14 @@ const pasteStrings = {
     shareActions: shareActionsStrings(locale),
   },
 };
-
-const shareStrings = {
-  latlngPlaceholder: t(locale, 'share.latlngPlaceholder'),
-  labelPlaceholder: t(locale, 'share.labelPlaceholder'),
-  useLocation: t(locale, 'share.useLocation'),
-  locating: t(locale, 'share.locating'),
-  generate: t(locale, 'share.generate'),
-  invalid: t(locale, 'share.invalid'),
-  locationDenied: t(locale, 'share.locationDenied'),
-  locationUnavailable: t(locale, 'share.locationUnavailable'),
-  locationTimeout: t(locale, 'share.locationTimeout'),
-  locationUnsupported: t(locale, 'share.locationUnsupported'),
-  approxLocation: t(locale, 'share.approxLocation'),
-};
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'home.title')}>
-  <div class="flex flex-col gap-10">
-    <section class="flex flex-col gap-6">
-      <div class="flex flex-col gap-2">
-        <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'home.title')}</h1>
-        <p class="text-text-2">{t(locale, 'home.subtitle')}</p>
-      </div>
-      <PasteBox client:load strings={pasteStrings} />
-    </section>
-
-    <section id="share" class="flex scroll-mt-20 flex-col gap-4 border-t border-border pt-8">
-      <div class="flex flex-col gap-2">
-        <h2 class="text-xl font-semibold text-text sm:text-2xl">{t(locale, 'share.title')}</h2>
-        <p class="text-text-2">{t(locale, 'share.subtitle')}</p>
-      </div>
-      <ShareLinkGenerator client:load strings={shareStrings} shareActions={shareActionsStrings(locale)} />
-    </section>
-  </div>
+  <section class="flex flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'home.title')}</h1>
+      <p class="text-text-2">{t(locale, 'home.subtitle')}</p>
+    </div>
+    <PasteBox client:load strings={pasteStrings} />
+  </section>
 </BaseLayout>

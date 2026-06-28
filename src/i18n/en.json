@@ -13,13 +13,13 @@
     "use": "Links & API"
   },
   "home": {
-    "title": "Open any map link in your app",
-    "subtitle": "Paste a Google, Apple, Waze or Yandex link — or coordinates, or a Plus Code — and pick the app you want. Or make a neutral link others can open in their own app.",
+    "title": "Open or share any place",
+    "subtitle": "Paste a map link, coordinates, a Plus Code or a place name — or use your location. Open it in the app you like, or share a neutral link others open in theirs.",
     "receiverTitle": "I got a map link",
     "shareTitle": "Share a place instead"
   },
   "paste": {
-    "placeholder": "Paste a map link, \"lat, lng\", or a Plus Code…",
+    "placeholder": "Paste a map link, \"lat, lng\", a Plus Code or a place name…",
     "resolve": "Find place",
     "resolving": "Resolving…",
     "paste": "Paste",

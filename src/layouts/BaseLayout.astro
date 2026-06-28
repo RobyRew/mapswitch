@@ -53,7 +53,6 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
       <div class="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
         <a href={path(locale)} class="text-base font-semibold text-text">🗺️ {t(locale, 'site.name')}</a>
         <nav class="flex items-center gap-4 text-sm text-text-2">
-          <a href={`${path(locale)}#share`} class="hover:text-accent">{t(locale, 'nav.share')}</a>
           <a href={path(locale, 'settings')} class="hover:text-accent">{t(locale, 'nav.settings')}</a>
           <a href={path(locale, 'account')} class="hover:text-accent">{t(locale, 'nav.account')}</a>
         </nav>

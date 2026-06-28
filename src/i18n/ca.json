@@ -12,8 +12,8 @@
     "use": "Enllaços i API"
   },
   "home": {
-    "title": "Obre qualsevol enllaç de mapes a la teva app",
-    "subtitle": "Enganxa un enllaç de Google, Apple, Waze o Yandex —o coordenades, o un Plus Code— i tria l'app que vulguis."
+    "title": "Obre o comparteix qualsevol lloc",
+    "subtitle": "Enganxa un enllaç de mapes, coordenades, un Plus Code o un nom de lloc — o fes servir la teva ubicació. Obre'l a l'app que vulguis o comparteix un enllaç neutral que cadascú obre a la seva."
   },
   "chooser": {
     "openIn": "Obre a…",
