@@ -34,7 +34,6 @@ export function shareActionsStrings(locale: Locale): ShareActionsStrings {
     yourLink: t(locale, 'share.yourLink'),
     copyNeutral: t(locale, 'chooser.share.copyNeutral'),
     shareButton: t(locale, 'chooser.share.shareButton'),
-    qr: t(locale, 'chooser.share.qr'),
     customSlugPlaceholder: t(locale, 'chooser.share.customSlugPlaceholder'),
     customSlugClaim: t(locale, 'chooser.share.customSlugClaim'),
     accountHref: path(locale, 'account'),
