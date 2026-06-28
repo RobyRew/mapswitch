@@ -64,7 +64,14 @@
     "none": "Preguntar siempre",
     "change": "Cambiar",
     "reset": "Restablecer",
-    "autoOpen": "Abrir automáticamente la próxima vez"
+    "autoOpen": "Abrir automáticamente la próxima vez",
+    "openNewTab": "Abrir los enlaces en una pestaña nueva"
+  },
+  "apps": {
+    "title": "Tus apps de mapas",
+    "hint": "Muestra, oculta y reordena las apps del selector «Abrir en…».",
+    "moveUp": "Subir",
+    "moveDown": "Bajar"
   },
   "settings": {
     "title": "Ajustes",

@@ -25,10 +25,24 @@ interface Props {
 const RADARBOT_HELP = 'https://github.com/RobyRew/mapswitch#radarbot-on-ios';
 
 export default function AppChooser({ match, platform, strings }: Props) {
-  const { update } = usePreferences();
+  const { prefs, update } = usePreferences();
   const [remember, setRemember] = useState(true);
   const [copiedApp, setCopiedApp] = useState<string | null>(null);
-  const options = useMemo(() => buildForRegistry(match, platform), [match, platform]);
+
+  // Respect the user's app visibility + ordering (Settings → "Your map apps").
+  const options = useMemo(() => {
+    const hidden = new Set(prefs.hiddenApps);
+    const order = prefs.appOrder;
+    const rank = (id: string) => {
+      const i = order.indexOf(id);
+      return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+    };
+    return buildForRegistry(match, platform)
+      .filter((o) => !hidden.has(o.id))
+      .sort((a, b) => rank(a.id) - rank(b.id));
+  }, [match, platform, prefs.hiddenApps, prefs.appOrder]);
+
+  const newTab = prefs.openInNewTab;
   const showRadarbotHint = platform === 'ios' && options.some((o) => o.id === 'radarbot' && o.available);
 
   function remembered(id: string) {
@@ -66,8 +80,8 @@ export default function AppChooser({ match, platform, strings }: Props) {
               {o.href ? (
                 <a
                   href={o.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  target={newTab ? '_blank' : '_self'}
+                  rel={newTab ? 'noopener noreferrer' : undefined}
                   onClick={() => remembered(o.id)}
                   className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-3 text-sm font-medium transition hover:bg-surface-2 active:scale-[0.98]"
                 >

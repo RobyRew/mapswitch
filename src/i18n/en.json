@@ -64,7 +64,14 @@
     "none": "Ask every time",
     "change": "Change",
     "reset": "Reset",
-    "autoOpen": "Open it automatically next time"
+    "autoOpen": "Open it automatically next time",
+    "openNewTab": "Open links in a new tab"
+  },
+  "apps": {
+    "title": "Your map apps",
+    "hint": "Show, hide and reorder the apps in the “Open in…” chooser.",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   },
   "settings": {
     "title": "Settings",

@@ -7,6 +7,7 @@ export interface ManagerStrings {
   change: string;
   reset: string;
   autoOpen: string;
+  openNewTab: string;
 }
 
 export default function DefaultAppManager({ strings }: { strings: ManagerStrings }) {
@@ -29,6 +30,15 @@ export default function DefaultAppManager({ strings }: { strings: ManagerStrings
           onChange={(e) => update({ autoOpen: e.target.checked })}
         />
         {strings.autoOpen}
+      </label>
+
+      <label className="flex items-center gap-2 text-text-2">
+        <input
+          type="checkbox"
+          checked={prefs.openInNewTab}
+          onChange={(e) => update({ openInNewTab: e.target.checked })}
+        />
+        {strings.openNewTab}
       </label>
 
       <div className="flex gap-2">

@@ -7,10 +7,23 @@ export interface Preferences {
   v: 1;
   defaultProviderId: string | null;
   autoOpen: boolean;
+  openInNewTab: boolean;
+  hiddenApps: string[];
+  appOrder: string[];
   lastPlatform?: Platform;
 }
 
-const DEFAULTS: Preferences = { v: 1, defaultProviderId: null, autoOpen: true };
+const DEFAULTS: Preferences = {
+  v: 1,
+  defaultProviderId: null,
+  autoOpen: true,
+  openInNewTab: true,
+  hiddenApps: [],
+  appOrder: [],
+};
+
+const strs = (v: unknown): string[] =>
+  Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
 
 function read(): Preferences {
   if (typeof localStorage === 'undefined') return DEFAULTS;
@@ -23,6 +36,9 @@ function read(): Preferences {
       v: 1,
       defaultProviderId: typeof parsed.defaultProviderId === 'string' ? parsed.defaultProviderId : null,
       autoOpen: parsed.autoOpen !== false,
+      openInNewTab: parsed.openInNewTab !== false,
+      hiddenApps: strs(parsed.hiddenApps),
+      appOrder: strs(parsed.appOrder),
       lastPlatform: parsed.lastPlatform,
     };
   } catch {
@@ -39,7 +55,8 @@ function write(p: Preferences): void {
 }
 
 // One cached pull of server-side prefs per page load (shared across islands).
-// Returns null for anonymous users (the API answers 401) — no-op then.
+// Returns null for anonymous users — no-op then. Only the synced fields live
+// server-side; UI prefs (new-tab, app order/visibility) stay per-browser.
 let serverPull: Promise<Pick<Preferences, 'defaultProviderId' | 'autoOpen'> | null> | undefined;
 function pullServerPrefs() {
   if (serverPull) return serverPull;
@@ -62,28 +79,31 @@ export function usePreferences() {
     const local = read();
     setPrefs(local);
     setLoaded(true);
-    // If signed in, let the account's stored preference win (cross-device).
+    // If signed in, let the account's stored preference win for the synced
+    // fields — but keep local-only UI prefs intact.
     void pullServerPrefs().then((server) => {
-      if (server) {
-        const merged: Preferences = { v: 1, ...server };
+      if (!server) return;
+      setPrefs((prev) => {
+        const merged: Preferences = { ...prev, ...server, v: 1 };
         write(merged);
-        setPrefs(merged);
-      }
+        return merged;
+      });
     });
   }, []);
 
   const update = useCallback((patch: Partial<Preferences>) => {
-    setPrefs((prev) => {
-      const next: Preferences = { ...prev, ...patch, v: 1 };
-      write(next);
-      // Best-effort server sync for signed-in users; anonymous → 401 (ignored).
-      void fetch('/api/preferences', {
-        method: 'PUT',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ defaultProviderId: next.defaultProviderId, autoOpen: next.autoOpen }),
-      }).catch(() => {});
-      return next;
-    });
+    // Merge onto the latest persisted prefs (not this island's snapshot) so
+    // concurrent islands — settings panels, the chooser — don't clobber each
+    // other's fields when they each write back the whole object.
+    const next: Preferences = { ...read(), ...patch, v: 1 };
+    write(next);
+    setPrefs(next);
+    // Best-effort server sync of the account-backed fields (anon → no-op).
+    void fetch('/api/preferences', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ defaultProviderId: next.defaultProviderId, autoOpen: next.autoOpen }),
+    }).catch(() => {});
   }, []);
 
   const reset = useCallback(() => {
