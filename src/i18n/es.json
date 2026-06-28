@@ -32,6 +32,7 @@
       "neutralTitle": "Comparte este lugar",
       "copyNeutral": "Copiar enlace neutral",
       "shareButton": "Compartir…",
+      "qr": "QR",
       "copyAppLink": "Copiar enlace"
     }
   },
@@ -140,9 +141,14 @@
     "loginRequired": "Inicia sesión para guardar enlaces cortos y ver tu historial.",
     "expiryLabel": "Caduca:",
     "expiryIndefinite": "Nunca (permanente)",
+    "expiry1h": "En 1 hora",
+    "expiry8h": "En 8 horas",
+    "expiry1d": "En 1 día",
     "expiry7d": "En 7 días",
     "expiry30d": "En 30 días",
+    "expiry6mo": "En 6 meses",
     "expiry1y": "En 1 año",
+    "expiry2y": "En 2 años",
     "anonNote": "Los enlaces anónimos caducan a los 7 días (máx. 20 por semana). Inicia sesión para conservarlos.",
     "weeklyLimit": "Límite semanal alcanzado (20 enlaces anónimos por 7 días). Inicia sesión para más.",
     "accountLimit": "Has alcanzado 1000 enlaces guardados — contáctame para ampliarlo.",

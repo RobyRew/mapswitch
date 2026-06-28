@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Platform } from '@/lib/providers/types';
+import { DEFAULT_EXPIRY, isExpiryToken, type ExpiryToken } from '@/lib/share/expiry';
 
 const KEY = 'mapswitch.prefs.v1';
 
@@ -10,6 +11,7 @@ export interface Preferences {
   openInNewTab: boolean;
   hiddenApps: string[];
   appOrder: string[];
+  defaultExpiry: ExpiryToken;
   lastPlatform?: Platform;
 }
 
@@ -20,6 +22,7 @@ const DEFAULTS: Preferences = {
   openInNewTab: true,
   hiddenApps: [],
   appOrder: [],
+  defaultExpiry: DEFAULT_EXPIRY,
 };
 
 const strs = (v: unknown): string[] =>
@@ -39,6 +42,7 @@ function read(): Preferences {
       openInNewTab: parsed.openInNewTab !== false,
       hiddenApps: strs(parsed.hiddenApps),
       appOrder: strs(parsed.appOrder),
+      defaultExpiry: isExpiryToken(parsed.defaultExpiry) ? parsed.defaultExpiry : DEFAULT_EXPIRY,
       lastPlatform: parsed.lastPlatform,
     };
   } catch {

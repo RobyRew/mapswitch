@@ -1,9 +1,11 @@
 ---
 export const prerender = true;
 import { LOCALES, isLocale, type Locale, t, path } from '@/i18n/utils';
+import { expiryStrings } from '@/i18n/strings';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import DefaultAppManager from '@/islands/DefaultAppManager';
 import AppsManager from '@/islands/AppsManager';
+import DefaultExpiry from '@/islands/DefaultExpiry';
 import SettingsExtras from '@/islands/SettingsExtras';
 
 export function getStaticPaths() {
@@ -50,6 +52,8 @@ const extrasStrings = {
     </div>
 
     <DefaultAppManager client:load strings={managerStrings} />
+
+    <DefaultExpiry client:load strings={expiryStrings(locale)} />
 
     <AppsManager client:load strings={appsStrings} />
 

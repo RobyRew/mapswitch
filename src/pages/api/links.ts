@@ -20,6 +20,7 @@ const Body = z.object({
   lng: z.number(),
   label: z.string().max(120).optional(),
   anonId: z.string().min(8).max(64).optional(),
+  expiresInMinutes: z.number().int().min(1).max(1_051_200).optional(),
   expiresInDays: z.number().int().min(1).max(3650).optional(),
   indefinite: z.boolean().optional(),
 });
@@ -64,7 +65,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
   const parsed = Body.safeParse(raw);
   if (!parsed.success) return json({ error: 'invalid_input' }, 400);
-  const { lat, lng, label, anonId, expiresInDays, indefinite } = parsed.data;
+  const { lat, lng, label, anonId, expiresInMinutes, expiresInDays, indefinite } = parsed.data;
   if (!isValidLatLng(lat, lng)) return json({ error: 'invalid_coords' }, 400);
 
   await store.links.pruneExpired(Date.now()); // opportunistic cleanup
@@ -84,7 +85,13 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'content-type': 'application/json', 'retry-after': String(rl.retryAfter) },
       });
     }
-    expiresAt = indefinite ? null : expiresInDays ? Date.now() + expiresInDays * 86_400_000 : null;
+    expiresAt = indefinite
+      ? null
+      : expiresInMinutes
+        ? Date.now() + expiresInMinutes * 60_000
+        : expiresInDays
+          ? Date.now() + expiresInDays * 86_400_000
+          : null;
   } else {
     if (!anonId) return json({ error: 'anon_id_required' }, 400);
     ownerToken = anonId;

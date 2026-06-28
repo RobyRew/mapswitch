@@ -32,6 +32,7 @@
       "neutralTitle": "Share this place",
       "copyNeutral": "Copy neutral link",
       "shareButton": "Share…",
+      "qr": "QR",
       "copyAppLink": "Copy link"
     }
   },
@@ -140,9 +141,14 @@
     "loginRequired": "Sign in to save short links and see your history.",
     "expiryLabel": "Expires:",
     "expiryIndefinite": "Never (permanent)",
+    "expiry1h": "In 1 hour",
+    "expiry8h": "In 8 hours",
+    "expiry1d": "In 1 day",
     "expiry7d": "In 7 days",
     "expiry30d": "In 30 days",
+    "expiry6mo": "In 6 months",
     "expiry1y": "In 1 year",
+    "expiry2y": "In 2 years",
     "anonNote": "Anonymous short links expire after 7 days (max 20 per week). Sign in to keep them.",
     "weeklyLimit": "Weekly limit reached (20 anonymous links per 7 days). Sign in for more.",
     "accountLimit": "You've reached 1000 saved links — please contact me to raise the limit.",
