@@ -26,6 +26,7 @@
     "better-sqlite3": "^12.10.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
+    "es-module-lexer": "^2.1.0",
     "nanoid": "^5.1.11",
     "qrcode": "^1.5.4",
     "react": "^19.2.6",
