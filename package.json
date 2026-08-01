@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "astro dev --host 0.0.0.0 --port 5176",
     "build": "astro check && astro build",
-    "preview": "node ./dist/server/entry.mjs",
+    "preview": "node ./server.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node ./scripts/migrate.mjs",
     "icons": "node ./scripts/gen-icons.mjs",

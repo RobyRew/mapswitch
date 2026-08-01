@@ -74,6 +74,25 @@ and/or a `link(target, platform)` for output), then add it to the array in
    DB is captured by Restic; install the backup cron from `SECURITY.md`.
 6. Set the account env vars (below). Migrations run automatically at container start.
 
+The container runs `server.mjs` — a thin wrapper over the Astro Node handler that
+applies the security headers to **every** response, including the prerendered
+pages that Astro middleware never sees. `PUBLIC_UMAMI_SCRIPT_URL` is read at
+runtime there, so setting it in Dokploy is enough to allow-list umami in the CSP
+(no rebuild needed).
+
+### CI & auto-deploy
+
+`.github/workflows/ci.yml` runs on every push/PR: lint → type-check → tests →
+production build, then **builds the real Docker image and boots it** — asserting
+`/api/health` responds and that the security headers reach a prerendered page.
+That container boot-smoke is the check that catches prune-only runtime breakage
+(e.g. a dependency that survives the dev build but not `npm prune --omit=dev`).
+
+To auto-deploy on push to `main`: in the Dokploy app, copy the deploy **Webhook
+URL**, then add it as the repo secret **`DOKPLOY_DEPLOY_WEBHOOK`** (Settings →
+Secrets → Actions). Without the secret the deploy job is a no-op and deploys stay
+manual.
+
 ## Accounts
 
 Authentication is delegated to the self-hosted **Logto** identity provider

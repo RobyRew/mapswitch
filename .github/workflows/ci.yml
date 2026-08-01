@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref (e.g. rapid pushes to a PR).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Lint · type-check · unit + integration tests · production build ────────
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  # ── Build the REAL production image and prove it actually boots ────────────
+  # This is the safety net the es-module-lexer crash slipped through: the image
+  # is `npm prune --omit=dev`'d, so only a real container boot catches a runtime
+  # dependency that the dev-only build never missed. We also assert that the
+  # security headers reach the prerendered pages (server.mjs wrapper).
+  docker-smoke:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t mapswitch:ci .
+
+      - name: Run container
+        run: |
+          docker run -d --name mapswitch \
+            -e DB_URL=file:/app/data/mapswitch.db \
+            -e PUBLIC_SITE_URL=http://localhost:4321 \
+            -p 4321:4321 mapswitch:ci
+
+      - name: Wait for health
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:4321/api/health >/dev/null 2>&1; then
+              echo "Healthy after ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::Server never became healthy"; docker logs mapswitch; exit 1
+
+      - name: Assert security headers on a prerendered page
+        run: |
+          set -e
+          headers=$(curl -fsS -D - -o /dev/null http://localhost:4321/en/about)
+          echo "$headers"
+          echo "$headers" | grep -iq '^content-security-policy:'   || { echo "::error::missing CSP on static page"; exit 1; }
+          echo "$headers" | grep -iq '^strict-transport-security:' || { echo "::error::missing HSTS on static page"; exit 1; }
+          echo "$headers" | grep -iq '^x-frame-options:'           || { echo "::error::missing X-Frame-Options on static page"; exit 1; }
+
+      - name: Assert security headers on an SSR route
+        run: |
+          set -e
+          headers=$(curl -fsS -D - -o /dev/null http://localhost:4321/api/health)
+          echo "$headers" | grep -iq '^content-security-policy:' || { echo "::error::missing CSP on SSR route"; exit 1; }
+
+      - name: Container logs
+        if: always()
+        run: docker logs mapswitch || true
+
+  # ── Trigger a Dokploy redeploy on push to main (opt-in via repo secret) ────
+  # Set DOKPLOY_DEPLOY_WEBHOOK in repo Settings → Secrets → Actions to the
+  # deploy webhook URL from the Dokploy app (Deployments → Webhook). Without it,
+  # this step is a no-op and deploys stay manual.
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test, docker-smoke]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Trigger Dokploy deploy
+        env:
+          HOOK: ${{ secrets.DOKPLOY_DEPLOY_WEBHOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "No DOKPLOY_DEPLOY_WEBHOOK secret set — skipping auto-deploy."
+            exit 0
+          fi
+          curl -fsSL -X POST "$HOOK" && echo "Dokploy deploy triggered."

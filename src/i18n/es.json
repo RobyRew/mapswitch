@@ -31,13 +31,19 @@
     "share": {
       "neutralTitle": "Comparte este lugar",
       "copyNeutral": "Copiar enlace neutral",
+      "linkType": "Tipo de enlace",
       "modeNeutral": "Enlace neutral",
       "modeShort": "Enlace corto",
       "shareButton": "Compartir…",
       "qr": "QR",
+      "downloadQr": "Descargar QR",
       "copyAppLink": "Copiar enlace",
       "customSlugPlaceholder": "nombre-personalizado (opcional)",
-      "customSlugClaim": "Reclama un nombre de usuario para enlaces personalizados →"
+      "customSlugClaim": "Reclama un nombre de usuario para enlaces personalizados →",
+      "slugChecking": "Comprobando…",
+      "slugAvailable": "✓ disponible",
+      "slugTaken": "✗ ya en uso",
+      "slugInvalid": "✗ nombre no válido"
     }
   },
   "share": {

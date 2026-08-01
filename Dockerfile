@@ -35,6 +35,7 @@ COPY --from=build --chown=app:app /app/node_modules ./node_modules
 COPY --from=build --chown=app:app /app/package.json ./package.json
 COPY --from=build --chown=app:app /app/drizzle ./drizzle
 COPY --from=build --chown=app:app /app/scripts ./scripts
+COPY --from=build --chown=app:app /app/server.mjs ./server.mjs
 
 # Data dir for the SQLite file (bind-mount /opt/mapswitch/data here in Dokploy).
 RUN mkdir -p /app/data && chown app:app /app/data
@@ -45,5 +46,6 @@ EXPOSE 4321
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD wget -qO- http://127.0.0.1:4321/api/health || exit 1
 
-# Apply migrations, then start the server. Migrations are idempotent.
-CMD ["sh", "-c", "node ./scripts/migrate.mjs && node ./dist/server/entry.mjs"]
+# Apply migrations, then start the server (wrapper adds security headers to the
+# prerendered pages too). Migrations are idempotent.
+CMD ["sh", "-c", "node ./scripts/migrate.mjs && node ./server.mjs"]

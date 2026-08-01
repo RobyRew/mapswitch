@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 import type { Platform } from '@/lib/providers/types';
 import { DEFAULT_EXPIRY, isExpiryToken, type ExpiryToken } from '@/lib/share/expiry';
 
@@ -58,56 +58,78 @@ function write(p: Preferences): void {
   }
 }
 
-// One cached pull of server-side prefs per page load (shared across islands).
-// Returns null for anonymous users — no-op then. Only the synced fields live
-// server-side; UI prefs (new-tab, app order/visibility) stay per-browser.
-let serverPull: Promise<Pick<Preferences, 'defaultProviderId' | 'autoOpen'> | null> | undefined;
-function pullServerPrefs() {
-  if (serverPull) return serverPull;
-  serverPull = fetch('/api/preferences')
+// ── One module-level store shared by every island ────────────────────────────
+// Previously each island held its own useState copy and wrote the whole object
+// back, so concurrent panels (settings + chooser) clobbered each other's fields.
+// A single source of truth + useSyncExternalStore means every island sees the
+// same object and re-renders together — no read()-merge dance needed.
+let state: Preferences = DEFAULTS;
+let hydrated = false;
+const listeners = new Set<() => void>();
+
+function emit() {
+  for (const l of listeners) l();
+}
+
+function setState(next: Preferences): void {
+  state = next;
+  write(next);
+  emit();
+}
+
+/** Sync the account-backed fields (anonymous → the PUT is a no-op server-side). */
+function syncServer(p: Preferences): void {
+  void fetch('/api/preferences', {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ defaultProviderId: p.defaultProviderId, autoOpen: p.autoOpen }),
+  }).catch(() => {});
+}
+
+// First hook to mount hydrates from localStorage, then (once) pulls the account's
+// synced fields and lets them win — keeping local-only UI prefs intact.
+function hydrateOnce(): void {
+  if (hydrated) return;
+  hydrated = true;
+  state = read();
+  emit();
+  fetch('/api/preferences')
     .then((r) => (r.ok ? r.json() : null))
-    .then((d: { preferences?: { defaultProviderId: string | null; autoOpen: boolean } } | null) =>
-      d?.preferences
-        ? { defaultProviderId: d.preferences.defaultProviderId ?? null, autoOpen: d.preferences.autoOpen !== false }
-        : null,
-    )
-    .catch(() => null);
-  return serverPull;
+    .then((d: { preferences?: { defaultProviderId: string | null; autoOpen: boolean } } | null) => {
+      const server = d?.preferences;
+      if (!server) return;
+      setState({
+        ...state,
+        defaultProviderId: server.defaultProviderId ?? null,
+        autoOpen: server.autoOpen !== false,
+        v: 1,
+      });
+    })
+    .catch(() => {});
+}
+
+function subscribe(cb: () => void): () => void {
+  listeners.add(cb);
+  hydrateOnce();
+  return () => listeners.delete(cb);
 }
 
 export function usePreferences() {
-  const [prefs, setPrefs] = useState<Preferences>(DEFAULTS);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const local = read();
-    setPrefs(local);
-    setLoaded(true);
-    // If signed in, let the account's stored preference win for the synced
-    // fields — but keep local-only UI prefs intact.
-    void pullServerPrefs().then((server) => {
-      if (!server) return;
-      setPrefs((prev) => {
-        const merged: Preferences = { ...prev, ...server, v: 1 };
-        write(merged);
-        return merged;
-      });
-    });
-  }, []);
+  const prefs = useSyncExternalStore(
+    subscribe,
+    () => state,
+    () => DEFAULTS,
+  );
+  const loaded = useSyncExternalStore(
+    subscribe,
+    () => hydrated,
+    () => false,
+  );
 
   const update = useCallback((patch: Partial<Preferences>) => {
-    // Merge onto the latest persisted prefs (not this island's snapshot) so
-    // concurrent islands — settings panels, the chooser — don't clobber each
-    // other's fields when they each write back the whole object.
-    const next: Preferences = { ...read(), ...patch, v: 1 };
-    write(next);
-    setPrefs(next);
-    // Best-effort server sync of the account-backed fields (anon → no-op).
-    void fetch('/api/preferences', {
-      method: 'PUT',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ defaultProviderId: next.defaultProviderId, autoOpen: next.autoOpen }),
-    }).catch(() => {});
+    const next: Preferences = { ...state, ...patch, v: 1 };
+    setState(next);
+    syncServer(next);
   }, []);
 
   const reset = useCallback(() => {
@@ -116,12 +138,9 @@ export function usePreferences() {
     } catch {
       /* ignore */
     }
-    setPrefs(DEFAULTS);
-    void fetch('/api/preferences', {
-      method: 'PUT',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ defaultProviderId: null, autoOpen: true }),
-    }).catch(() => {});
+    state = DEFAULTS;
+    emit();
+    syncServer({ ...DEFAULTS, defaultProviderId: null, autoOpen: true });
   }, []);
 
   return { prefs, loaded, update, reset };

@@ -1,8 +1,22 @@
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 
-/** Renders a QR code for a link, generated client-side (no third party). */
-export default function QrCode({ value, size = 168 }: { value: string; size?: number }) {
+/**
+ * Renders a QR code for a link, generated client-side (no third party). When
+ * `downloadLabel` is set, a download link is shown beneath it (the PNG data URL
+ * is already in hand, so saving it is free).
+ */
+export default function QrCode({
+  value,
+  size = 168,
+  downloadLabel,
+  downloadName = 'mapswitch-qr.png',
+}: {
+  value: string;
+  size?: number;
+  downloadLabel?: string;
+  downloadName?: string;
+}) {
   const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,12 +35,13 @@ export default function QrCode({ value, size = 168 }: { value: string; size?: nu
 
   if (!src) return null;
   return (
-    <img
-      src={src}
-      width={size}
-      height={size}
-      alt="QR code"
-      className="rounded-lg bg-white p-2"
-    />
+    <span className="flex flex-col items-center gap-1.5">
+      <img src={src} width={size} height={size} alt="QR code" className="rounded-lg bg-white p-2" />
+      {downloadLabel && (
+        <a href={src} download={downloadName} className="text-xs text-accent hover:underline">
+          {downloadLabel}
+        </a>
+      )}
+    </span>
   );
 }

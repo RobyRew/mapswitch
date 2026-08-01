@@ -31,13 +31,19 @@
     "share": {
       "neutralTitle": "Share this place",
       "copyNeutral": "Copy neutral link",
+      "linkType": "Link type",
       "modeNeutral": "Neutral link",
       "modeShort": "Short link",
       "shareButton": "Share…",
       "qr": "QR",
+      "downloadQr": "Download QR",
       "copyAppLink": "Copy link",
       "customSlugPlaceholder": "custom-name (optional)",
-      "customSlugClaim": "Claim a username to make custom links →"
+      "customSlugClaim": "Claim a username to make custom links →",
+      "slugChecking": "Checking…",
+      "slugAvailable": "✓ available",
+      "slugTaken": "✗ already taken",
+      "slugInvalid": "✗ invalid name"
     }
   },
   "share": {

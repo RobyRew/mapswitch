@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { buildShareUrl } from '@/lib/share/encode';
 import { EXPIRY_TOKENS, expiryMinutes, DEFAULT_EXPIRY, type ExpiryToken } from '@/lib/share/expiry';
+import { normalizeSlug, isValidSlug } from '@/lib/share/slug';
 import type { BuildTarget } from '@/lib/providers/types';
 import type { ExpiryStrings } from '@/i18n/strings';
 import { getAnonId } from './hooks/useAnonId';
@@ -11,6 +12,7 @@ import QrCode from './QrCode';
 export interface ShareActionsStrings {
   neutralTitle: string;
   namePlaceholder: string;
+  linkType: string;
   modeNeutral: string;
   modeShort: string;
   yourLink: string;
@@ -18,8 +20,13 @@ export interface ShareActionsStrings {
   copy: string;
   copied: string;
   shareButton: string;
+  downloadQr: string;
   customSlugPlaceholder: string;
   customSlugClaim: string;
+  slugChecking: string;
+  slugAvailable: string;
+  slugTaken: string;
+  slugInvalid: string;
   accountHref: string;
   saveShorten: string;
   expiry: ExpiryStrings;
@@ -29,12 +36,15 @@ export interface ShareActionsStrings {
   error: string;
 }
 
+type Mode = 'neutral' | 'short';
+type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
+
 const canShare = () => typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
 /**
  * One unified share panel for a resolved place: name it, pick the link type
  * (neutral /o or a saved short /x), and the chosen link shows once with Copy ·
- * Share and an auto-rendered QR.
+ * Share and an auto-rendered QR (with a download link).
  */
 export default function ShareActions({
   target,
@@ -47,16 +57,19 @@ export default function ShareActions({
 }) {
   const signedIn = useSignedIn();
   const { prefs, loaded } = usePreferences();
-  const [mode, setMode] = useState<'neutral' | 'short'>('neutral');
+  const [mode, setMode] = useState<Mode>('neutral');
   const [name, setName] = useState(target.label ?? '');
   const [expiry, setExpiry] = useState<ExpiryToken>(DEFAULT_EXPIRY);
   const [customSlug, setCustomSlug] = useState('');
+  const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle');
   const [username, setUsername] = useState<string | null>(null);
   const [shortLink, setShortLink] = useState<string | null>(null);
   const [shortNote, setShortNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const modeRefs = useRef<Record<Mode, HTMLButtonElement | null>>({ neutral: null, short: null });
 
   useEffect(() => {
     if (loaded) setExpiry(prefs.defaultExpiry);
@@ -82,6 +95,39 @@ export default function ShareActions({
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const effective = { ...target, label: name.trim() || undefined };
   const neutralLink = buildShareUrl(origin, effective);
+  const normalizedSlug = normalizeSlug(customSlug);
+
+  // Live availability of the vanity slug as it's typed (debounced).
+  useEffect(() => {
+    if (!username || !customSlug.trim()) {
+      setSlugStatus('idle');
+      return;
+    }
+    if (!isValidSlug(normalizedSlug)) {
+      setSlugStatus('invalid');
+      return;
+    }
+    setSlugStatus('checking');
+    let alive = true;
+    const id = setTimeout(() => {
+      fetch(`/api/links/check?slug=${encodeURIComponent(normalizedSlug)}`)
+        .then((r) => r.json())
+        .then((d: { valid?: boolean; available?: boolean }) => {
+          if (!alive) return;
+          setSlugStatus(d.valid ? (d.available ? 'available' : 'taken') : 'invalid');
+        })
+        .catch(() => {
+          if (alive) setSlugStatus('idle');
+        });
+    }, 350);
+    return () => {
+      alive = false;
+      clearTimeout(id);
+    };
+  }, [customSlug, username, normalizedSlug]);
+
+  const slugBlocking =
+    !!customSlug.trim() && (slugStatus === 'checking' || slugStatus === 'taken' || slugStatus === 'invalid');
 
   async function copy(value: string) {
     try {
@@ -141,7 +187,7 @@ export default function ShareActions({
         <span className="text-xs text-text-3">{label}</span>
         <code className="block break-all text-sm text-text">{url}</code>
         <div className="flex justify-center">
-          <QrCode value={url} />
+          <QrCode value={url} downloadLabel={strings.downloadQr} />
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -165,11 +211,28 @@ export default function ShareActions({
     );
   }
 
-  const tab = (value: 'neutral' | 'short', text: string) => (
+  function selectMode(value: Mode) {
+    setMode(value);
+    modeRefs.current[value]?.focus();
+  }
+
+  function onGroupKey(e: ReactKeyboardEvent) {
+    if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(e.key)) {
+      e.preventDefault();
+      selectMode(mode === 'neutral' ? 'short' : 'neutral');
+    }
+  }
+
+  const tab = (value: Mode, text: string) => (
     <button
       type="button"
-      onClick={() => setMode(value)}
-      aria-pressed={mode === value}
+      role="radio"
+      aria-checked={mode === value}
+      tabIndex={mode === value ? 0 : -1}
+      ref={(el) => {
+        modeRefs.current[value] = el;
+      }}
+      onClick={() => selectMode(value)}
       className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
         mode === value ? 'bg-accent text-accent-text' : 'text-text-2 hover:bg-surface-3'
       }`}
@@ -177,6 +240,14 @@ export default function ShareActions({
       {text}
     </button>
   );
+
+  const slugHint = () => {
+    if (slugStatus === 'checking') return <span className="text-text-3">{strings.slugChecking}</span>;
+    if (slugStatus === 'available') return <span className="text-success">{strings.slugAvailable}</span>;
+    if (slugStatus === 'taken') return <span className="text-danger">{strings.slugTaken}</span>;
+    if (slugStatus === 'invalid') return <span className="text-danger">{strings.slugInvalid}</span>;
+    return null;
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -189,7 +260,12 @@ export default function ShareActions({
         className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-accent"
       />
 
-      <div className="flex gap-1 rounded-lg border border-border p-1">
+      <div
+        role="radiogroup"
+        aria-label={strings.linkType}
+        onKeyDown={onGroupKey}
+        className="flex gap-1 rounded-lg border border-border p-1"
+      >
         {tab('neutral', strings.modeNeutral)}
         {tab('short', strings.modeShort)}
       </div>
@@ -206,15 +282,25 @@ export default function ShareActions({
           {signedIn ? (
             <>
               {username ? (
-                <label className="flex items-center gap-1 text-sm text-text-2">
-                  <span className="shrink-0 text-text-3">/x/{username}/</span>
-                  <input
-                    value={customSlug}
-                    onChange={(e) => setCustomSlug(e.target.value)}
-                    placeholder={strings.customSlugPlaceholder}
-                    className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-sm text-text outline-none focus:border-accent"
-                  />
-                </label>
+                <div className="flex flex-col gap-1">
+                  <label className="flex items-center gap-1 text-sm text-text-2">
+                    <span className="shrink-0 text-text-3">/x/{username}/</span>
+                    <input
+                      value={customSlug}
+                      onChange={(e) => setCustomSlug(e.target.value)}
+                      placeholder={strings.customSlugPlaceholder}
+                      className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-sm text-text outline-none focus:border-accent"
+                    />
+                  </label>
+                  {customSlug.trim() && (
+                    <p className="break-all text-xs">
+                      <span className="text-text-3">
+                        {origin}/x/{username}/
+                      </span>
+                      <span className="text-text">{normalizedSlug}</span> {slugHint()}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <a href={strings.accountHref} className="text-xs text-accent hover:underline">
                   {strings.customSlugClaim}
@@ -241,7 +327,7 @@ export default function ShareActions({
           <button
             type="button"
             onClick={createShort}
-            disabled={saving}
+            disabled={saving || slugBlocking}
             className="self-start rounded-lg bg-accent px-4 py-2.5 font-medium text-accent-text hover:bg-accent-hover disabled:opacity-60"
           >
             🔗 {strings.saveShorten}
