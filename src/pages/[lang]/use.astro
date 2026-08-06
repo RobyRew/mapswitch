@@ -24,14 +24,14 @@ const curlPost = `curl -s ${base}/api/resolve \\
   -d '{"input":"https://maps.app.goo.gl/J6VcNgZTzK4WtZFm6"}'`;
 const jsonShape = `{ "match": { "lat": 41.1151, "lng": 1.21836, "label": "…", "source": "google" } }`;
 
-const box = 'block overflow-x-auto whitespace-pre rounded-lg border border-border bg-surface-2 p-3 text-sm text-text';
+const box = 'panel-2 block overflow-x-auto whitespace-pre p-4 font-mono text-sm text-text';
 const h2 = 'mt-2 text-xl font-semibold text-text';
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'nav.use')}>
   <article class="flex flex-col gap-5 leading-relaxed text-text-2">
     <header class="flex flex-col gap-2">
-      <h1 class="text-2xl font-semibold text-text sm:text-3xl">Use it anywhere</h1>
+      <h1 class="text-gradient text-3xl font-bold tracking-tight sm:text-4xl">Use it anywhere</h1>
       <p>
         MapSwitch can open or resolve a location straight from a URL — handy for bookmarks, Apple
         Shortcuts, bots, or your own apps. Every entry accepts the same inputs: a Google / Apple / Waze /

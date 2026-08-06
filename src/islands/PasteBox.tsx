@@ -10,6 +10,7 @@ export interface PasteStrings {
   resolve: string;
   resolving: string;
   paste: string;
+  try: string;
   error: string;
   useLocation: string;
   locating: string;
@@ -86,6 +87,13 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
     } catch {
       /* clipboard permission denied — user can paste manually */
     }
+  }
+
+  // Example inputs that showcase what MapSwitch accepts (coords / Plus Code / place).
+  const EXAMPLES = ['48.8584, 2.2945', '8FVC9G8F+5W', 'Sagrada Família'];
+  function fillExample(v: string) {
+    setValue(v);
+    void resolve(v);
   }
 
   // Approximate, city-level location from the request IP — only when the
@@ -166,46 +174,52 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
           e.preventDefault();
           void resolve(value);
         }}
-        className="flex flex-col gap-3"
+        className="panel flex flex-col gap-4 p-4 sm:p-5"
       >
         <textarea
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={strings.placeholder}
-          rows={3}
-          className="w-full resize-y rounded-lg border border-border bg-surface px-3 py-2 text-base text-text outline-none focus:border-accent"
+          rows={2}
+          className="field resize-y text-base"
         />
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="submit"
-            disabled={busy}
-            className="min-w-32 flex-1 rounded-lg bg-accent px-4 py-2.5 font-medium text-accent-text transition hover:bg-accent-hover disabled:opacity-60"
-          >
-            {busy ? strings.resolving : strings.resolve}
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <button type="submit" disabled={busy} className="btn btn-primary min-w-36 flex-1">
+            {busy ? (
+              strings.resolving
+            ) : (
+              <>
+                <span aria-hidden="true">🔍</span> {strings.resolve}
+              </>
+            )}
           </button>
-          <button
-            type="button"
-            onClick={pasteFromClipboard}
-            className="rounded-lg border border-border px-4 py-2.5 font-medium text-text hover:bg-surface-2"
-          >
-            {strings.paste}
+          <button type="button" onClick={pasteFromClipboard} className="btn btn-glass">
+            <span aria-hidden="true">📋</span> {strings.paste}
           </button>
-          <button
-            type="button"
-            onClick={detectLocation}
-            disabled={locating}
-            className="rounded-lg border border-border px-4 py-2.5 font-medium text-text hover:bg-surface-2 disabled:opacity-60"
-          >
-            {locating ? strings.locating : `📍 ${strings.useLocation}`}
+          <button type="button" onClick={detectLocation} disabled={locating} className="btn btn-glass">
+            <span aria-hidden="true">📍</span> {locating ? strings.locating : strings.useLocation}
           </button>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 border-t border-border/60 pt-3">
+          <span className="text-xs font-medium text-text-3">{strings.try}</span>
+          {EXAMPLES.map((ex) => (
+            <button key={ex} type="button" onClick={() => fillExample(ex)} className="chip">
+              {ex}
+            </button>
+          ))}
         </div>
       </form>
 
-      {error && <p className="text-sm text-danger">{error}</p>}
-      {approx && <p className="text-xs text-text-3">📍 {strings.approxLocation}</p>}
+      {error && (
+        <p className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-2.5 text-sm text-danger">
+          {error}
+        </p>
+      )}
+      {approx && <p className="px-1 text-xs text-text-3">📍 {strings.approxLocation}</p>}
 
       {match && (
-        <div className="rounded-xl border border-border bg-surface-2 p-4">
+        <div className="panel p-4 sm:p-5" style={{ animation: 'var(--animate-slide-up)' }}>
           <AppChooser match={match} platform={platform} strings={strings.chooser} />
         </div>
       )}

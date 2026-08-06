@@ -61,20 +61,26 @@ export default function AppChooser({ match, platform, strings }: Props) {
   const placeName = match.label?.trim();
 
   return (
-    <div className="flex flex-col gap-4">
-      <p className="flex items-baseline gap-2 text-text">
-        <span aria-hidden="true">📍</span>
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <span
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-lg shadow-sm"
+          style={{ background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)' }}
+          aria-hidden="true"
+        >
+          📍
+        </span>
         <span className="min-w-0">
-          {placeName && <span className="font-medium">{placeName}</span>}
-          <span className={`block text-xs text-text-3 ${placeName ? '' : 'text-sm text-text'}`}>
+          {placeName && <span className="block truncate font-semibold text-text">{placeName}</span>}
+          <span className={`block font-mono text-xs ${placeName ? 'text-text-3' : 'text-sm text-text'}`}>
             {match.lat}, {match.lng}
           </span>
         </span>
-      </p>
+      </div>
 
       <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-text-2">{strings.openIn}</p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-text-3">{strings.openIn}</p>
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
           {options.map((o) => (
             <div key={o.id} className="relative">
               {o.href ? (
@@ -83,21 +89,23 @@ export default function AppChooser({ match, platform, strings }: Props) {
                   target={newTab ? '_blank' : '_self'}
                   rel={newTab ? 'noopener noreferrer' : undefined}
                   onClick={() => remembered(o.id)}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-3 text-sm font-medium transition hover:bg-surface-2 active:scale-[0.98]"
+                  className="app-tile"
                 >
-                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: o.color ?? '#8e8e93' }} />
+                  <span
+                    className="h-3 w-3 shrink-0 rounded-full ring-2 ring-white/40"
+                    style={{ backgroundColor: o.color ?? '#8e8e93' }}
+                  />
                   <span className="truncate">{o.name}</span>
                 </a>
               ) : (
-                <button
-                  type="button"
-                  disabled
-                  className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-border px-3 py-3 text-sm font-medium opacity-40"
-                >
-                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: o.color ?? '#8e8e93' }} />
+                <div className="app-tile app-tile-off">
+                  <span
+                    className="h-3 w-3 shrink-0 rounded-full"
+                    style={{ backgroundColor: o.color ?? '#8e8e93' }}
+                  />
                   <span className="truncate">{o.name}</span>
-                  <span className="text-[10px] text-text-3">{strings.unavailable}</span>
-                </button>
+                  <span className="ml-auto text-[10px] text-text-3">{strings.unavailable}</span>
+                </div>
               )}
               {o.href && (
                 <button
@@ -108,7 +116,7 @@ export default function AppChooser({ match, platform, strings }: Props) {
                     e.stopPropagation();
                     void copyApp(o.id, o.href!);
                   }}
-                  className="absolute right-1 top-1 rounded px-1 text-[11px] leading-none text-text-3 hover:bg-surface-3 hover:text-text"
+                  className="absolute right-1.5 top-1.5 grid h-6 w-6 place-items-center rounded-full text-[11px] leading-none text-text-3 transition hover:bg-surface-3 hover:text-text"
                 >
                   {copiedApp === o.id ? '✓' : '⧉'}
                 </button>
@@ -120,19 +128,24 @@ export default function AppChooser({ match, platform, strings }: Props) {
         {showRadarbotHint && (
           <p className="text-xs text-text-3">
             {strings.radarbotSetup}{' '}
-            <a href={RADARBOT_HELP} target="_blank" rel="noreferrer" className="text-accent hover:underline">
+            <a href={RADARBOT_HELP} target="_blank" rel="noreferrer" className="link-accent">
               {strings.radarbotSetupLink}
             </a>
           </p>
         )}
 
-        <label className="flex items-center gap-2 text-sm text-text-2">
-          <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-text-2">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+            className="h-4 w-4 accent-accent"
+          />
           {strings.remember}
         </label>
       </div>
 
-      <div className="border-t border-border pt-3">
+      <div className="border-t border-border pt-4">
         <ShareActions target={match} strings={strings.shareActions} />
       </div>
     </div>

@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css';
 import { type Locale, DEFAULT_LOCALE, alternateLinks, t, path } from '@/i18n/utils';
+import ThemeToggle from '@/islands/ThemeToggle';
 
 interface Props {
   locale: Locale;
@@ -12,6 +13,8 @@ const { locale, title, description } = Astro.props;
 const pageTitle = title ? `${title} · ${t(locale, 'site.name')}` : t(locale, 'site.name');
 const desc = description ?? t(locale, 'site.tagline');
 const alts = alternateLinks(Astro.url.pathname);
+const here = Astro.url.pathname;
+const isActive = (seg: string) => here.endsWith(`/${seg}`) || here.includes(`/${seg}/`);
 
 const umamiSrc = import.meta.env.PUBLIC_UMAMI_SCRIPT_URL;
 const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
@@ -27,8 +30,8 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1c1e" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f7fb" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0c10" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -48,38 +51,71 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
     <script is:inline src="/sw-register.js"></script>
     {umamiSrc && umamiId && <script is:inline defer src={umamiSrc} data-website-id={umamiId}></script>}
   </head>
-  <body class="min-h-dvh flex flex-col">
-    <header class="border-b border-border">
-      <div class="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
-        <a href={path(locale)} class="text-base font-semibold text-text">🗺️ {t(locale, 'site.name')}</a>
-        <nav class="flex items-center gap-4 text-sm text-text-2">
-          <a href={path(locale, 'settings')} class="hover:text-accent">{t(locale, 'nav.settings')}</a>
-          <a href={path(locale, 'account')} class="hover:text-accent">{t(locale, 'nav.account')}</a>
-        </nav>
+  <body class="flex min-h-dvh flex-col">
+    <header class="safe-top sticky top-0 z-50">
+      <div class="mx-auto w-full max-w-2xl px-4">
+        <div class="panel-2 mt-3 flex items-center justify-between gap-3 rounded-full px-3 py-2 pl-3.5">
+          <a href={path(locale)} class="group flex items-center gap-2.5" aria-label={t(locale, 'site.name')}>
+            <span
+              class="grid h-8 w-8 place-items-center rounded-xl shadow-sm transition group-hover:scale-105"
+              style="background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M12 22s7-6.03 7-12a7 7 0 1 0-14 0c0 5.97 7 12 7 12Z"
+                  fill="white"
+                  fill-opacity="0.95"></path>
+                <circle cx="12" cy="10" r="2.6" fill="var(--accent)"></circle>
+              </svg>
+            </span>
+            <span class="text-[15px] font-semibold tracking-tight text-text">{t(locale, 'site.name')}</span>
+          </a>
+          <nav class="flex items-center gap-1 text-sm">
+            <a
+              href={path(locale, 'settings')}
+              class={`rounded-full px-3 py-1.5 font-medium transition hover:text-accent ${isActive('settings') ? 'text-accent' : 'text-text-2'}`}
+              >{t(locale, 'nav.settings')}</a
+            >
+            <a
+              href={path(locale, 'account')}
+              class={`rounded-full px-3 py-1.5 font-medium transition hover:text-accent ${isActive('account') ? 'text-accent' : 'text-text-2'}`}
+              >{t(locale, 'nav.account')}</a
+            >
+            <ThemeToggle client:load label={t(locale, 'settings.theme')} />
+          </nav>
+        </div>
       </div>
     </header>
 
-    <main class="mx-auto w-full max-w-2xl flex-1 px-4 py-8">
+    <main
+      class="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:py-12"
+      style="animation: var(--animate-slide-up);"
+    >
       <slot />
     </main>
 
-    <footer class="border-t border-border">
-      <div class="mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-text-3">
+    <footer class="safe-bottom mt-8">
+      <div
+        class="mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-text-3"
+      >
         <div class="flex flex-wrap gap-4">
-          <a href={path(locale, 'use')} class="hover:text-accent">{t(locale, 'nav.use')}</a>
-          <a href={path(locale, 'privacy')} class="hover:text-accent">{t(locale, 'nav.privacy')}</a>
-          <a href={path(locale, 'about')} class="hover:text-accent">{t(locale, 'nav.about')}</a>
+          <a href={path(locale, 'use')} class="transition hover:text-accent">{t(locale, 'nav.use')}</a>
+          <a href={path(locale, 'privacy')} class="transition hover:text-accent">{t(locale, 'nav.privacy')}</a>
+          <a href={path(locale, 'about')} class="transition hover:text-accent">{t(locale, 'nav.about')}</a>
           <a
             href="https://github.com/RobyRew/mapswitch"
             target="_blank"
             rel="noreferrer"
-            class="hover:text-accent">GitHub</a
+            class="transition hover:text-accent">GitHub</a
           >
         </div>
         <span>
           {t(locale, 'footer.madeBy')} · by{' '}
-          <a href="https://github.com/robyrew" target="_blank" rel="noreferrer" class="font-medium hover:text-accent"
-            >RobyRew</a
+          <a
+            href="https://github.com/robyrew"
+            target="_blank"
+            rel="noreferrer"
+            class="font-medium text-text-2 transition hover:text-accent">RobyRew</a
           >
         </span>
       </div>

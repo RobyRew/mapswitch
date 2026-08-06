@@ -17,6 +17,7 @@ const pasteStrings = {
   resolve: t(locale, 'paste.resolve'),
   resolving: t(locale, 'paste.resolving'),
   paste: t(locale, 'paste.paste'),
+  try: t(locale, 'paste.try'),
   error: t(locale, 'paste.error'),
   useLocation: t(locale, 'share.useLocation'),
   locating: t(locale, 'share.locating'),
@@ -39,10 +40,16 @@ const pasteStrings = {
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'home.title')}>
-  <section class="flex flex-col gap-6">
-    <div class="flex flex-col gap-2">
-      <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'home.title')}</h1>
-      <p class="text-text-2">{t(locale, 'home.subtitle')}</p>
+  <section class="flex flex-col gap-7">
+    <div class="flex flex-col gap-3 text-center sm:pt-4">
+      <span
+        class="mx-auto inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs font-medium text-text-2"
+        style="background: var(--glass-bg-strong); backdrop-filter: blur(10px);"
+      >
+        <span aria-hidden="true">✨</span>{t(locale, 'site.tagline')}
+      </span>
+      <h1 class="text-gradient text-4xl font-bold tracking-tight sm:text-5xl">{t(locale, 'home.title')}</h1>
+      <p class="mx-auto max-w-xl text-balance text-text-2">{t(locale, 'home.subtitle')}</p>
     </div>
     <PasteBox client:load strings={pasteStrings} />
   </section>

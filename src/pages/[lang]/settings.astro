@@ -47,7 +47,7 @@ const extrasStrings = {
 <BaseLayout locale={locale} title={t(locale, 'settings.title')}>
   <section class="flex flex-col gap-6">
     <div class="flex flex-col gap-2">
-      <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'settings.title')}</h1>
+      <h1 class="text-gradient text-3xl font-bold tracking-tight sm:text-4xl">{t(locale, 'settings.title')}</h1>
       <p class="text-text-2">{t(locale, 'settings.subtitle')}</p>
     </div>
 
@@ -57,19 +57,12 @@ const extrasStrings = {
 
     <AppsManager client:load strings={appsStrings} />
 
-    <div class="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4 text-sm">
+    <div class="panel-2 flex flex-col gap-3 p-4 text-sm">
       <span class="text-text-2">{t(locale, 'settings.language')}</span>
       <div class="flex flex-wrap gap-2">
         {
           LOCALES.map((loc) => (
-            <a
-              href={path(loc, 'settings')}
-              class={`rounded-md border px-3 py-1.5 transition ${
-                loc === locale
-                  ? 'border-accent bg-accent text-accent-text'
-                  : 'border-border text-text hover:bg-surface-3'
-              }`}
-            >
+            <a href={path(loc, 'settings')} class={loc === locale ? 'btn btn-primary btn-sm' : 'chip'}>
               {LANG_NAMES[loc]}
             </a>
           ))

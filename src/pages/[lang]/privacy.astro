@@ -12,16 +12,20 @@ const locale: Locale = isLocale(lang) ? lang : 'en';
 ---
 
 <BaseLayout locale={locale} title={t(locale, 'privacy.title')}>
-  <section class="flex flex-col gap-6">
-    <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'privacy.title')}</h1>
+  <section class="flex flex-col gap-5">
+    <h1 class="text-gradient text-3xl font-bold tracking-tight sm:text-4xl">{t(locale, 'privacy.title')}</h1>
 
-    <div class="flex flex-col gap-2">
-      <h2 class="text-lg font-semibold text-text">{t(locale, 'privacy.anonymousTitle')}</h2>
+    <div class="panel flex flex-col gap-2 p-6">
+      <h2 class="flex items-center gap-2 text-lg font-semibold text-text">
+        <span aria-hidden="true">🕶️</span>{t(locale, 'privacy.anonymousTitle')}
+      </h2>
       <p class="leading-relaxed text-text-2">{t(locale, 'privacy.anonymousBody')}</p>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <h2 class="text-lg font-semibold text-text">{t(locale, 'privacy.accountTitle')}</h2>
+    <div class="panel flex flex-col gap-2 p-6">
+      <h2 class="flex items-center gap-2 text-lg font-semibold text-text">
+        <span aria-hidden="true">🔐</span>{t(locale, 'privacy.accountTitle')}
+      </h2>
       <p class="leading-relaxed text-text-2">{t(locale, 'privacy.accountBody')}</p>
     </div>
   </section>

@@ -17,7 +17,7 @@
 const INLINE_SCRIPT_HASHES = [
   "'sha256-YmRmj8JZSFEeMG2aZy0MxpRcOtpAiWGhtr4oMKryW50='", // theme bootstrap
   "'sha256-QzWFZi+FLIx23tnm9SBU4aEgx4x8DsuASP07mfqol/c='", // astro client:load shim
-  "'sha256-U7a72oKuFFz8D7GUHLA1NZ0ciymHmDOc9T9aVDg2rWU='", // astro-island runtime
+  "'sha256-SaCkFfPruIdTXT8/97JArQmGxiJAL2o4bBDvSgJ5y3Q='", // astro-island runtime (Astro 7)
 ];
 
 /** Origin of a script URL (for allow-listing umami), or null if unset/invalid. */

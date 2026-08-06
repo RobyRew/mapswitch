@@ -20,6 +20,7 @@
     "resolve": "Cerca el lloc",
     "resolving": "Resolent…",
     "paste": "Enganxa",
+    "try": "Prova",
     "error": "No s'ha pogut llegir cap ubicació. Prova amb un altre enllaç o enganxa coordenades com 48.8584, 2.2945."
   },
   "chooser": {

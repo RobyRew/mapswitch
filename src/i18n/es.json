@@ -20,6 +20,7 @@
     "resolve": "Buscar lugar",
     "resolving": "Resolviendo…",
     "paste": "Pegar",
+    "try": "Prueba",
     "error": "No se pudo leer una ubicación. Prueba con otro enlace o pega coordenadas como 48.8584, 2.2945."
   },
   "chooser": {

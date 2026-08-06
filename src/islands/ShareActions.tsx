@@ -183,26 +183,18 @@ export default function ShareActions({
 
   function linkPanel(url: string, label: string) {
     return (
-      <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4">
-        <span className="text-xs text-text-3">{label}</span>
-        <code className="block break-all text-sm text-text">{url}</code>
-        <div className="flex justify-center">
+      <div className="panel-2 flex flex-col gap-3 p-4">
+        <span className="text-xs font-medium uppercase tracking-wide text-text-3">{label}</span>
+        <code className="block break-all font-mono text-sm text-text">{url}</code>
+        <div className="flex justify-center py-1">
           <QrCode value={url} downloadLabel={strings.downloadQr} />
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => copy(url)}
-            className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-text hover:bg-accent-hover"
-          >
-            {copied ? strings.copied : strings.copy}
+          <button type="button" onClick={() => copy(url)} className="btn btn-primary btn-sm flex-1">
+            {copied ? `✓ ${strings.copied}` : strings.copy}
           </button>
           {canShare() && (
-            <button
-              type="button"
-              onClick={() => share(url)}
-              className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-3"
-            >
+            <button type="button" onClick={() => share(url)} className="btn btn-glass btn-sm">
               {strings.shareButton}
             </button>
           )}
@@ -233,9 +225,7 @@ export default function ShareActions({
         modeRefs.current[value] = el;
       }}
       onClick={() => selectMode(value)}
-      className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
-        mode === value ? 'bg-accent text-accent-text' : 'text-text-2 hover:bg-surface-3'
-      }`}
+      className="seg-item"
     >
       {text}
     </button>
@@ -260,12 +250,7 @@ export default function ShareActions({
         className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-accent"
       />
 
-      <div
-        role="radiogroup"
-        aria-label={strings.linkType}
-        onKeyDown={onGroupKey}
-        className="flex gap-1 rounded-lg border border-border p-1"
-      >
+      <div role="radiogroup" aria-label={strings.linkType} onKeyDown={onGroupKey} className="seg">
         {tab('neutral', strings.modeNeutral)}
         {tab('short', strings.modeShort)}
       </div>
@@ -278,18 +263,18 @@ export default function ShareActions({
           {shortNote && <p className="text-xs text-text-3">{shortNote}</p>}
         </>
       ) : (
-        <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4">
+        <div className="panel-2 flex flex-col gap-3 p-4">
           {signedIn ? (
             <>
               {username ? (
                 <div className="flex flex-col gap-1">
                   <label className="flex items-center gap-1 text-sm text-text-2">
-                    <span className="shrink-0 text-text-3">/x/{username}/</span>
+                    <span className="shrink-0 font-mono text-text-3">/x/{username}/</span>
                     <input
                       value={customSlug}
                       onChange={(e) => setCustomSlug(e.target.value)}
                       placeholder={strings.customSlugPlaceholder}
-                      className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-sm text-text outline-none focus:border-accent"
+                      className="field min-w-0 flex-1 !py-1.5 text-sm"
                     />
                   </label>
                   {customSlug.trim() && (
@@ -302,7 +287,7 @@ export default function ShareActions({
                   )}
                 </div>
               ) : (
-                <a href={strings.accountHref} className="text-xs text-accent hover:underline">
+                <a href={strings.accountHref} className="link-accent text-xs">
                   {strings.customSlugClaim}
                 </a>
               )}
@@ -311,7 +296,7 @@ export default function ShareActions({
                 <select
                   value={expiry}
                   onChange={(e) => setExpiry(e.target.value as ExpiryToken)}
-                  className="rounded-md border border-border bg-surface px-2 py-1 text-sm text-text"
+                  className="field w-auto !py-1.5 text-sm"
                 >
                   {EXPIRY_TOKENS.map((tk) => (
                     <option key={tk} value={tk}>
@@ -328,7 +313,7 @@ export default function ShareActions({
             type="button"
             onClick={createShort}
             disabled={saving || slugBlocking}
-            className="self-start rounded-lg bg-accent px-4 py-2.5 font-medium text-accent-text hover:bg-accent-hover disabled:opacity-60"
+            className="btn btn-primary self-start"
           >
             🔗 {strings.saveShorten}
           </button>

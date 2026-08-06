@@ -60,15 +60,12 @@ export default function HistoryList({ strings, baseUrl }: { strings: HistoryStri
       ) : (
         <ul className="flex flex-col gap-2">
           {items.map((it) => (
-            <li
-              key={it.slug}
-              className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface-2 p-3"
-            >
+            <li key={it.slug} className="panel-2 flex items-center justify-between gap-2 p-3">
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium text-text">
                   {it.label || `${it.lat}, ${it.lng}`}
                 </div>
-                <div className="truncate text-xs text-text-3">
+                <div className="truncate font-mono text-xs text-text-3">
                   /x/{it.slug} · {it.hitCount}× ·{' '}
                   {it.expiresAt
                     ? `${strings.expires} ${new Date(it.expiresAt).toLocaleDateString()}`
@@ -76,17 +73,13 @@ export default function HistoryList({ strings, baseUrl }: { strings: HistoryStri
                 </div>
               </div>
               <div className="flex shrink-0 gap-2">
-                <button
-                  type="button"
-                  onClick={() => copy(it.slug)}
-                  className="rounded-md border border-border px-2.5 py-1 text-xs hover:bg-surface-3"
-                >
+                <button type="button" onClick={() => copy(it.slug)} className="btn btn-glass btn-sm">
                   {copied === it.slug ? strings.copied : strings.copy}
                 </button>
                 <button
                   type="button"
                   onClick={() => remove(it.slug)}
-                  className="rounded-md border border-border px-2.5 py-1 text-xs text-danger hover:bg-surface-3"
+                  className="btn btn-glass btn-sm btn-danger"
                 >
                   {strings.delete}
                 </button>

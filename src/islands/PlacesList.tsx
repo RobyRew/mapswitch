@@ -43,24 +43,24 @@ export default function PlacesList({ strings }: { strings: PlacesStrings }) {
 
   function section(title: string, items: Place[], kind: 'saved' | 'opened') {
     return (
-      <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 p-4 text-sm">
+      <div className="panel-2 flex flex-col gap-2 p-4 text-sm">
         <span className="text-text-2">{title}</span>
         {items.length === 0 ? (
           <p className="text-xs text-text-3">{strings.empty}</p>
         ) : (
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-0.5">
             {items.map((p) => (
-              <li key={p.id} className="flex items-center gap-2">
-                <a href={href(p)} className="min-w-0 flex-1 truncate text-text hover:text-accent">
+              <li key={p.id} className="flex items-center gap-3 rounded-lg px-2 py-2 transition hover:bg-surface-3/60">
+                <a href={href(p)} className="min-w-0 flex-1 truncate text-text transition hover:text-accent">
                   {p.label || `${p.lat}, ${p.lng}`}
                 </a>
-                <a href={href(p)} className="shrink-0 text-xs text-accent hover:underline">
+                <a href={href(p)} className="link-accent shrink-0 text-xs">
                   {strings.open}
                 </a>
                 <button
                   type="button"
                   onClick={() => remove(p.id, kind)}
-                  className="shrink-0 text-xs text-danger hover:underline"
+                  className="shrink-0 text-xs text-danger transition hover:underline"
                 >
                   {strings.delete}
                 </button>

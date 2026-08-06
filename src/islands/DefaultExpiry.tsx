@@ -8,12 +8,12 @@ export default function DefaultExpiry({ strings }: { strings: ExpiryStrings }) {
   if (!loaded) return null;
 
   return (
-    <label className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface-2 p-4 text-sm text-text-2">
+    <label className="panel-2 flex items-center justify-between gap-2 p-4 text-sm text-text-2">
       {strings.label}
       <select
         value={prefs.defaultExpiry}
         onChange={(e) => update({ defaultExpiry: e.target.value as ExpiryToken })}
-        className="rounded-md border border-border bg-surface px-2 py-1 text-text"
+        className="field w-auto !py-1.5 text-sm"
       >
         {EXPIRY_TOKENS.map((tk) => (
           <option key={tk} value={tk}>

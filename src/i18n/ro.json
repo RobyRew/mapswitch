@@ -20,6 +20,7 @@
     "resolve": "Caută locul",
     "resolving": "Se rezolvă…",
     "paste": "Lipește",
+    "try": "Încearcă",
     "error": "Nu am putut citi nicio locație. Încearcă alt link sau lipește coordonate ca 48.8584, 2.2945."
   },
   "chooser": {

@@ -57,7 +57,7 @@ const base = import.meta.env.PUBLIC_SITE_URL || Astro.url.origin;
 
 <BaseLayout locale={locale} title={t(locale, 'account.myAccount')}>
   <section class="flex flex-col gap-6">
-    <h1 class="text-2xl font-semibold text-text sm:text-3xl">{t(locale, 'account.myAccount')}</h1>
+    <h1 class="text-gradient text-3xl font-bold tracking-tight sm:text-4xl">{t(locale, 'account.myAccount')}</h1>
     <AccountPanel client:load email={user.email} strings={accountStrings} signOutPath="/api/auth/sign-out" />
     <UsernameClaim client:load strings={usernameStrings} />
     <DefaultAppManager client:load strings={managerStrings} />

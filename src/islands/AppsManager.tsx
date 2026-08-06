@@ -39,19 +39,20 @@ export default function AppsManager({ strings }: { strings: AppsManagerStrings }
   if (!loaded) return null;
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4 text-sm">
+    <div className="panel-2 flex flex-col gap-3 p-4 text-sm">
       <span className="text-text-2">{strings.title}</span>
       <p className="text-xs text-text-3">{strings.hint}</p>
       <ul className="flex flex-col gap-1">
         {ordered.map((a, index) => {
           const isHidden = hidden.has(a.id);
           return (
-            <li key={a.id} className="flex items-center gap-2 rounded-md px-1 py-1.5 hover:bg-surface-3">
+            <li key={a.id} className="flex items-center gap-2.5 rounded-lg px-2 py-2 transition hover:bg-surface-3/60">
               <input
                 type="checkbox"
                 checked={!isHidden}
                 onChange={() => toggle(a.id)}
                 aria-label={a.name}
+                className="h-4 w-4 accent-accent"
               />
               <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: a.color ?? '#8e8e93' }} />
               <span className={`flex-1 ${isHidden ? 'text-text-3 line-through' : 'text-text'}`}>{a.name}</span>

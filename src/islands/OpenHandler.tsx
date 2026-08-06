@@ -62,7 +62,9 @@ export default function OpenHandler({ match, strings }: { match: Match | null; s
   }, [signedIn, match]);
 
   if (!match) {
-    return <p className="text-text-2">{strings.noLocation}</p>;
+    return (
+      <div className="panel p-6 text-center text-text-2">{strings.noLocation}</div>
+    );
   }
 
   const defaultProvider = prefs.defaultProviderId ? providerById(prefs.defaultProviderId) : null;
@@ -70,28 +72,21 @@ export default function OpenHandler({ match, strings }: { match: Match | null; s
   return (
     <div className="flex flex-col gap-6">
       {willAutoOpen && defaultOption?.href ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface-2 p-5 text-center">
-          <p className="text-lg font-medium text-text">
+        <div className="panel flex flex-col gap-4 p-6 text-center" style={{ animation: 'var(--animate-scale-in)' }}>
+          <p className="text-lg font-semibold text-text">
             {strings.openingIn.replace('{{app}}', defaultProvider?.name ?? '')}
           </p>
           <div className="flex flex-wrap justify-center gap-2">
-            <a
-              href={defaultOption.href}
-              className="rounded-lg bg-accent px-5 py-2.5 font-medium text-accent-text hover:bg-accent-hover"
-            >
+            <a href={defaultOption.href} className="btn btn-primary">
               {strings.openNow}
             </a>
-            <button
-              type="button"
-              onClick={() => setOverride(true)}
-              className="rounded-lg border border-border px-5 py-2.5 font-medium text-text hover:bg-surface-3"
-            >
+            <button type="button" onClick={() => setOverride(true)} className="btn btn-glass">
               {strings.chooseDifferent}
             </button>
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-border bg-surface-2 p-4">
+        <div className="panel p-4 sm:p-5" style={{ animation: 'var(--animate-slide-up)' }}>
           <AppChooser match={match} platform={platform} strings={strings.chooser} />
         </div>
       )}
@@ -105,7 +100,7 @@ export default function OpenHandler({ match, strings }: { match: Match | null; s
               .catch(() => {});
           }}
           disabled={saved}
-          className="self-start rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-text hover:bg-surface-2 disabled:opacity-60"
+          className="btn btn-glass self-start"
         >
           {saved ? `✓ ${strings.saved}` : `💾 ${strings.savePlace}`}
         </button>

@@ -50,10 +50,10 @@ export default function UsernameClaim({ strings }: { strings: UsernameStrings })
   if (!loaded) return null;
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 p-4 text-sm">
+    <div className="panel-2 flex flex-col gap-2 p-4 text-sm">
       <span className="text-text-2">{strings.label}</span>
       {username ? (
-        <strong className="text-text">@{username}</strong>
+        <strong className="font-mono text-text">@{username}</strong>
       ) : (
         <>
           <p className="text-xs text-text-3">{strings.help}</p>
@@ -62,13 +62,13 @@ export default function UsernameClaim({ strings }: { strings: UsernameStrings })
               value={value}
               onChange={(e) => setValue(e.target.value)}
               placeholder={strings.placeholder}
-              className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1.5 text-text outline-none focus:border-accent"
+              className="field min-w-0 flex-1 !py-2"
             />
             <button
               type="button"
               onClick={claim}
               disabled={saving || value.trim().length < 3}
-              className="rounded-md bg-accent px-3 py-1.5 font-medium text-accent-text hover:bg-accent-hover disabled:opacity-60"
+              className="btn btn-primary btn-sm"
             >
               {strings.claim}
             </button>

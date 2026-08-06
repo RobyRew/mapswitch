@@ -68,19 +68,17 @@ export default function SettingsExtras({ strings }: { strings: SettingsExtrasStr
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-2 p-4 text-sm">
+      <div className="panel-2 flex flex-col gap-3 p-4 text-sm">
         <span className="text-text-2">{strings.theme}</span>
-        <div className="flex flex-wrap gap-2">
+        <div className="seg max-w-xs">
           {opts.map((o) => (
             <button
               key={o.id}
               type="button"
               onClick={() => choose(o.id)}
-              className={`rounded-md border px-3 py-1.5 transition ${
-                mode === o.id
-                  ? 'border-accent bg-accent text-accent-text'
-                  : 'border-border text-text hover:bg-surface-3'
-              }`}
+              aria-checked={mode === o.id}
+              role="radio"
+              className="seg-item"
             >
               {o.label}
             </button>
@@ -88,14 +86,10 @@ export default function SettingsExtras({ strings }: { strings: SettingsExtrasStr
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 p-4 text-sm">
+      <div className="panel-2 flex flex-col gap-2 p-4 text-sm">
         <span className="text-text-2">{strings.clearData}</span>
         <p className="text-xs text-text-3">{strings.clearDataDesc}</p>
-        <button
-          type="button"
-          onClick={clearData}
-          className="self-start rounded-md border border-border px-3 py-1.5 text-danger hover:bg-surface-3"
-        >
+        <button type="button" onClick={clearData} className="btn btn-glass btn-sm btn-danger mt-1 self-start">
           {cleared ? strings.cleared : strings.clearData}
         </button>
       </div>

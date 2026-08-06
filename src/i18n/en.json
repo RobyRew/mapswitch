@@ -20,6 +20,7 @@
     "resolve": "Find place",
     "resolving": "Resolving…",
     "paste": "Paste",
+    "try": "Try",
     "error": "Couldn't read a location from that. Try another link, or paste coordinates like 48.8584, 2.2945."
   },
   "chooser": {
