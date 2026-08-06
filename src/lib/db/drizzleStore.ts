@@ -1,7 +1,7 @@
-import { eq, and, or, gt, lt, desc, sql, isNull, isNotNull, notInArray } from 'drizzle-orm';
+import { eq, ne, and, or, gt, lt, desc, sql, isNull, isNotNull, notInArray } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { getDb, type DB } from './client';
-import { preferences, savedLinks, linkHistory, users, places } from './schema';
+import { preferences, savedLinks, linkHistory, users, places, usernameAliases } from './schema';
 import type { Store, SavedLink, NewLink, Place, NewPlace, PlaceKind } from './store';
 
 type LinkRow = typeof savedLinks.$inferSelect;
@@ -16,6 +16,7 @@ function rowToLink(r: LinkRow): SavedLink {
     lng: r.lng,
     label: r.label ?? undefined,
     customSlug: r.customSlug ?? null,
+    oneTime: r.oneTime,
     createdAt: r.createdAt.getTime(),
     expiresAt: r.expiresAt ? r.expiresAt.getTime() : null,
     hitCount: r.hitCount,
@@ -63,8 +64,45 @@ export function createDrizzleStore(db: DB = getDb()): Store {
         return row?.username ?? null;
       },
       async setUsername(userId, username) {
-        // The unique index enforces global uniqueness; a clash throws (caller handles).
+        // Claim or change. The unique index enforces global uniqueness (clash throws).
+        const [cur] = await db
+          .select({ username: users.username })
+          .from(users)
+          .where(eq(users.id, userId))
+          .limit(1);
+        const previous = cur?.username ?? null;
+        if (previous === username) return; // no-op
+        // Reclaiming one of your own retired handles → drop that alias first.
+        await db.delete(usernameAliases).where(eq(usernameAliases.username, username));
         await db.update(users).set({ username }).where(eq(users.id, userId));
+        // Retire the previous handle so old /@<previous>/<slug> links still resolve.
+        if (previous) {
+          await db
+            .insert(usernameAliases)
+            .values({ username: previous, userId, createdAt: Date.now() })
+            .onConflictDoUpdate({ target: usernameAliases.username, set: { userId, createdAt: Date.now() } });
+        }
+      },
+      async resolveUsername(username) {
+        const [live] = await db
+          .select({ id: users.id, username: users.username })
+          .from(users)
+          .where(eq(users.username, username))
+          .limit(1);
+        if (live) return { userId: live.id, canonical: live.username ?? username };
+        // Retired alias → point at the owner's CURRENT handle for a redirect.
+        const [alias] = await db
+          .select({ userId: usernameAliases.userId })
+          .from(usernameAliases)
+          .where(eq(usernameAliases.username, username))
+          .limit(1);
+        if (!alias) return null;
+        const [owner] = await db
+          .select({ username: users.username })
+          .from(users)
+          .where(eq(users.id, alias.userId))
+          .limit(1);
+        return { userId: alias.userId, canonical: owner?.username ?? username };
       },
       async idByUsername(username) {
         const [row] = await db
@@ -74,12 +112,25 @@ export function createDrizzleStore(db: DB = getDb()): Store {
           .limit(1);
         return row?.id ?? null;
       },
-      async usernameTaken(username) {
-        const [row] = await db
+      async usernameTaken(username, exceptUserId) {
+        const [u] = await db
           .select({ c: sql<number>`count(*)` })
           .from(users)
-          .where(eq(users.username, username));
-        return (row?.c ?? 0) > 0;
+          .where(
+            exceptUserId
+              ? and(eq(users.username, username), ne(users.id, exceptUserId))
+              : eq(users.username, username),
+          );
+        if ((u?.c ?? 0) > 0) return true;
+        const [a] = await db
+          .select({ c: sql<number>`count(*)` })
+          .from(usernameAliases)
+          .where(
+            exceptUserId
+              ? and(eq(usernameAliases.username, username), ne(usernameAliases.userId, exceptUserId))
+              : eq(usernameAliases.username, username),
+          );
+        return (a?.c ?? 0) > 0;
       },
     },
 
@@ -94,6 +145,7 @@ export function createDrizzleStore(db: DB = getDb()): Store {
           lng: link.lng,
           label: link.label ?? null,
           customSlug: link.customSlug ?? null,
+          oneTime: link.oneTime ?? false,
           createdAt: new Date(),
           expiresAt: link.expiresAt ? new Date(link.expiresAt) : null,
           hitCount: 0,
@@ -145,6 +197,9 @@ export function createDrizzleStore(db: DB = getDb()): Store {
           .update(savedLinks)
           .set({ hitCount: sql`${savedLinks.hitCount} + 1` })
           .where(eq(savedLinks.slug, slug));
+      },
+      async consumeOneTime(slug) {
+        await db.delete(savedLinks).where(and(eq(savedLinks.slug, slug), eq(savedLinks.oneTime, true)));
       },
       async countByUser(userId) {
         const [row] = await db

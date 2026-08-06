@@ -5,7 +5,6 @@ import { usePlatform } from './hooks/usePlatform';
 import { usePreferences } from './hooks/usePreferences';
 import { useSignedIn } from './hooks/useSignedIn';
 import AppChooser, { type ChooserStrings } from './AppChooser';
-import DefaultAppManager, { type ManagerStrings } from './DefaultAppManager';
 
 export interface OpenStrings {
   openingIn: string;
@@ -15,7 +14,6 @@ export interface OpenStrings {
   savePlace: string;
   saved: string;
   chooser: ChooserStrings;
-  manager: ManagerStrings;
 }
 
 function postPlace(match: Match, kind: 'saved' | 'opened') {
@@ -87,7 +85,7 @@ export default function OpenHandler({ match, strings }: { match: Match | null; s
         </div>
       ) : (
         <div className="panel p-4 sm:p-5" style={{ animation: 'var(--animate-slide-up)' }}>
-          <AppChooser match={match} platform={platform} strings={strings.chooser} />
+          <AppChooser match={match} platform={platform} strings={strings.chooser} variant="open" />
         </div>
       )}
 
@@ -105,8 +103,6 @@ export default function OpenHandler({ match, strings }: { match: Match | null; s
           {saved ? `✓ ${strings.saved}` : `💾 ${strings.savePlace}`}
         </button>
       )}
-
-      <DefaultAppManager strings={strings.manager} />
     </div>
   );
 }

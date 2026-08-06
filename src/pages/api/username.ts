@@ -13,20 +13,30 @@ function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
 }
 
-// GET → { username | null }. POST { username } → claim it (one-time per account).
-export const GET: APIRoute = async ({ request }) => {
+// GET → { username | null }. GET ?check=<name> → { username, valid, available }
+// (live availability while typing; excludes the caller's own current handle).
+export const GET: APIRoute = async ({ request, url }) => {
   const user = await getUser(request);
+  const check = url.searchParams.get('check');
+  if (check !== null) {
+    if (!user) return json({ error: 'unauthorized' }, 401);
+    const store = getStore();
+    if (!store) return json({ error: 'unavailable' }, 503);
+    const username = normalizeUsername(check);
+    if (!isValidUsername(username)) return json({ username, valid: false, available: false });
+    const taken = await store.users.usernameTaken(username, user.id);
+    return json({ username, valid: true, available: !taken });
+  }
   return json({ username: user?.username ?? null });
 };
 
+// POST { username } → claim it, or CHANGE to it if you already have one. The old
+// handle is retired into an alias so previously-shared links still resolve.
 export const POST: APIRoute = async ({ request }) => {
   const user = await getUser(request);
   if (!user) return json({ error: 'unauthorized' }, 401);
   const store = getStore();
   if (!store) return json({ error: 'unavailable' }, 503);
-
-  // Claim-once: changing a username would break existing vanity links.
-  if (user.username) return json({ error: 'already_set', username: user.username }, 409);
 
   let raw: unknown;
   try {
@@ -40,12 +50,13 @@ export const POST: APIRoute = async ({ request }) => {
 
   const username = normalizeUsername(parsed.data.username);
   if (!isValidUsername(username)) return json({ error: 'invalid_username' }, 400);
-  if (await store.users.usernameTaken(username)) return json({ error: 'username_taken' }, 409);
+  if (username === user.username) return json({ ok: true, username }); // no-op
+  if (await store.users.usernameTaken(username, user.id)) return json({ error: 'username_taken' }, 409);
 
   try {
     await store.users.setUsername(user.id, username);
   } catch {
     return json({ error: 'username_taken' }, 409); // unique-index race
   }
-  return json({ ok: true, username });
+  return json({ ok: true, username, previous: user.username ?? null });
 };

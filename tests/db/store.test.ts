@@ -140,3 +140,45 @@ describe('drizzle store — places (saved / opened)', () => {
     expect((await store.places.listByUser('u2', 'opened')).length).toBe(3);
   });
 });
+
+describe('drizzle store — username change + aliases', () => {
+  it('changes a handle, retires the old one, resolves both', async () => {
+    await store.users.setUsername('u2', 'firstname');
+    await store.users.setUsername('u2', 'secondname');
+    expect(await store.users.getUsername('u2')).toBe('secondname');
+    // old handle → owner's CURRENT handle (for a 301)
+    expect(await store.users.resolveUsername('firstname')).toMatchObject({ userId: 'u2', canonical: 'secondname' });
+    // current handle → itself
+    expect(await store.users.resolveUsername('secondname')).toMatchObject({ userId: 'u2', canonical: 'secondname' });
+    // retired handle is reserved to others, free to its owner
+    expect(await store.users.usernameTaken('firstname')).toBe(true);
+    expect(await store.users.usernameTaken('firstname', 'u2')).toBe(false);
+  });
+
+  it('reclaiming your own retired handle frees the alias', async () => {
+    await store.users.setUsername('u2', 'firstname'); // back to first
+    expect(await store.users.getUsername('u2')).toBe('firstname');
+    // 'secondname' is now the alias pointing at the current handle
+    expect(await store.users.resolveUsername('secondname')).toMatchObject({ userId: 'u2', canonical: 'firstname' });
+  });
+
+  it('cannot take a handle reserved as another account alias', async () => {
+    // u2 retired 'secondname'; u1 must not be able to claim it.
+    expect(await store.users.usernameTaken('secondname', 'u1')).toBe(true);
+  });
+});
+
+describe('drizzle store — one-time links', () => {
+  it('creates a one-time link and consumes it on use', async () => {
+    await store.links.create({ slug: 'once01', userId: 'u1', lat: 1, lng: 2, oneTime: true });
+    expect((await store.links.get('once01'))?.oneTime).toBe(true);
+    await store.links.consumeOneTime('once01');
+    expect(await store.links.get('once01')).toBeNull();
+  });
+
+  it('consumeOneTime leaves normal links untouched', async () => {
+    await store.links.create({ slug: 'norm01', userId: 'u1', lat: 3, lng: 4 });
+    await store.links.consumeOneTime('norm01');
+    expect(await store.links.get('norm01')).not.toBeNull();
+  });
+});

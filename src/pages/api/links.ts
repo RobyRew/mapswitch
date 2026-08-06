@@ -24,6 +24,7 @@ const Body = z.object({
   expiresInMinutes: z.number().int().min(1).max(1_051_200).optional(),
   expiresInDays: z.number().int().min(1).max(3650).optional(),
   indefinite: z.boolean().optional(),
+  oneTime: z.boolean().optional(),
   customSlug: z.string().max(60).optional(),
 });
 
@@ -67,8 +68,10 @@ export const POST: APIRoute = async ({ request }) => {
   }
   const parsed = Body.safeParse(raw);
   if (!parsed.success) return json({ error: 'invalid_input' }, 400);
-  const { lat, lng, label, anonId, expiresInMinutes, expiresInDays, indefinite, customSlug } = parsed.data;
+  const { lat, lng, label, anonId, expiresInMinutes, expiresInDays, indefinite, oneTime, customSlug } =
+    parsed.data;
   if (!isValidLatLng(lat, lng)) return json({ error: 'invalid_coords' }, 400);
+  const wantOneTime = oneTime === true;
 
   await store.links.pruneExpired(Date.now()); // opportunistic cleanup
 
@@ -131,11 +134,12 @@ export const POST: APIRoute = async ({ request }) => {
     lng: roundCoord(lng),
     label,
     customSlug: vanity,
+    oneTime: wantOneTime,
     expiresAt,
   });
   if (userId) await store.history.add(userId, slug);
 
   const origin = process.env.PUBLIC_SITE_URL || new URL(request.url).origin;
-  const url = vanity && user?.username ? `${origin}/x/${user.username}/${vanity}` : `${origin}/x/${slug}`;
-  return json({ slug, url, expiresAt });
+  const url = vanity && user?.username ? `${origin}/@${user.username}/${vanity}` : `${origin}/x/${slug}`;
+  return json({ slug, url, expiresAt, oneTime: wantOneTime });
 };

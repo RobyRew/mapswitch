@@ -13,12 +13,24 @@ export interface PreferenceStore {
   set(userId: string, prefs: DevicePreferences): Promise<void>;
 }
 
+export interface UsernameResolution {
+  userId: string;
+  canonical: string; // the user's CURRENT handle (may differ from the queried one)
+}
+
 export interface UserStore {
   getUsername(userId: string): Promise<string | null>;
-  /** Claim a username for a user. Throws on unique-constraint clash (already taken). */
+  /**
+   * Claim OR change a username. The previous handle (if any) is retired into an
+   * alias so old /@<old>/<slug> links still resolve; reclaiming one of your own
+   * aliases frees it. Throws on a clash with another user's handle/alias.
+   */
   setUsername(userId: string, username: string): Promise<void>;
-  idByUsername(username: string): Promise<string | null>;
-  usernameTaken(username: string): Promise<boolean>;
+  /** Resolve a handle — current or retired alias — to its owner + current handle. */
+  resolveUsername(username: string): Promise<UsernameResolution | null>;
+  idByUsername(username: string): Promise<string | null>; // current handles only
+  /** Taken by anyone (current handle or alias), optionally excluding one user's own names. */
+  usernameTaken(username: string, exceptUserId?: string): Promise<boolean>;
 }
 
 export interface SavedLink {
@@ -29,7 +41,8 @@ export interface SavedLink {
   lat: number;
   lng: number;
   label?: string;
-  customSlug?: string | null; // vanity slug → /x/<username>/<customSlug>
+  customSlug?: string | null; // vanity slug → /@<username>/<customSlug>
+  oneTime: boolean; // self-deletes on first open
   createdAt: number;
   expiresAt?: number | null; // null = indefinite
   hitCount: number;
@@ -44,6 +57,7 @@ export interface NewLink {
   lng: number;
   label?: string;
   customSlug?: string | null;
+  oneTime?: boolean;
   expiresAt?: number | null;
 }
 
@@ -56,6 +70,8 @@ export interface LinkStore {
   deleteOwned(slug: string, userId: string): Promise<boolean>; // logged-in owner
   deleteAnon(slug: string, ownerToken: string): Promise<boolean>; // anonymous owner
   incrementHit(slug: string): Promise<void>;
+  /** Delete a one-time link after it's been served once. */
+  consumeOneTime(slug: string): Promise<void>;
   countByUser(userId: string): Promise<number>;
   /** Anonymous links created since `sinceMs`, matched by token OR ipHash. */
   countRecentByAnon(ownerToken: string, ipHash: string, sinceMs: number): Promise<number>;

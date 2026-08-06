@@ -15,6 +15,13 @@
       "when": 1782658056582,
       "tag": "0001_strong_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1786045324660,
+      "tag": "0002_busy_thunderball",
+      "breakpoints": true
     }
   ]
 }

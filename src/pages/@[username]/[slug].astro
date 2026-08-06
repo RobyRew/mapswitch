@@ -8,25 +8,36 @@ import { getStore } from '@/lib/db';
 import type { Match } from '@/lib/providers/types';
 import { normalizeUsername, normalizeSlug } from '@/lib/share/slug';
 
+// Canonical vanity link: /@<username>/<customSlug>. The literal "@" segment can
+// never collide with real pages (/settings, /en, /api, …), so no reserved-word
+// gymnastics are needed. Retired handles (after a username change) 301 here.
 const username = normalizeUsername(Astro.params.username ?? '');
 const slug = normalizeSlug(Astro.params.slug ?? '');
 const store = getStore();
+const langParam = Astro.url.searchParams.get('lang') ?? undefined;
+const locale: Locale = isLocale(langParam) ? langParam : DEFAULT_LOCALE;
 
 let match: Match | null = null;
 if (username && slug && store) {
-  const userId = await store.users.idByUsername(username);
-  if (userId) {
-    const link = await store.links.getByUserCustomSlug(userId, slug);
+  const resolved = await store.users.resolveUsername(username);
+  if (resolved) {
+    // Queried an old handle → send them to the owner's current one.
+    if (resolved.canonical && resolved.canonical !== username) {
+      return Astro.redirect(
+        `/@${resolved.canonical}/${slug}${langParam ? `?lang=${encodeURIComponent(langParam)}` : ''}`,
+        301,
+      );
+    }
+    const link = await store.links.getByUserCustomSlug(resolved.userId, slug);
     if (link && (!link.expiresAt || link.expiresAt > Date.now())) {
       await store.links.incrementHit(link.slug);
       match = { lat: link.lat, lng: link.lng, label: link.label, source: 'slug' };
+      // One-time link → delete now that it's been served once.
+      if (link.oneTime) await store.links.consumeOneTime(link.slug);
     }
   }
 }
-Astro.response.status = match ? 200 : 404; // 404 for missing/expired vanity links
-
-const langParam = Astro.url.searchParams.get('lang') ?? undefined;
-const locale: Locale = isLocale(langParam) ? langParam : DEFAULT_LOCALE;
+Astro.response.status = match ? 200 : 404; // 404 for missing/expired/consumed links
 
 const strings = {
   openingIn: t(locale, 'open.openingIn'),
@@ -43,15 +54,8 @@ const strings = {
     copied: t(locale, 'share.copied'),
     radarbotSetup: t(locale, 'chooser.radarbotSetup'),
     radarbotSetupLink: t(locale, 'chooser.radarbotSetupLink'),
+    makeYourOwn: t(locale, 'chooser.makeYourOwn'),
     shareActions: shareActionsStrings(locale),
-  },
-  manager: {
-    defaultLabel: t(locale, 'manager.defaultLabel'),
-    none: t(locale, 'manager.none'),
-    change: t(locale, 'manager.change'),
-    reset: t(locale, 'manager.reset'),
-    autoOpen: t(locale, 'manager.autoOpen'),
-    openNewTab: t(locale, 'manager.openNewTab'),
   },
 };
 ---

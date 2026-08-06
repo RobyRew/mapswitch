@@ -8,6 +8,7 @@ export interface ExpiryStrings {
 }
 
 const EXPIRY_KEY: Record<ExpiryToken, string> = {
+  once: 'account.expiryOnce',
   '1h': 'account.expiry1h',
   '8h': 'account.expiry8h',
   '1d': 'account.expiry1d',

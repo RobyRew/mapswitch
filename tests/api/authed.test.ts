@@ -26,14 +26,16 @@ import { GET as linksGET, POST as linksPOST } from '@/pages/api/links';
 type CtxOpts = { method?: string; body?: unknown; params?: Record<string, string>; url?: string };
 
 function ctx(opts: CtxOpts = {}) {
+  const url = opts.url ?? 'https://maps.robyrew.com/api/x';
   const init: RequestInit = { method: opts.method ?? 'GET' };
   if (opts.body !== undefined) {
     init.body = JSON.stringify(opts.body);
     init.headers = { 'content-type': 'application/json' };
   }
   return {
-    request: new Request(opts.url ?? 'https://maps.robyrew.com/api/x', init),
+    request: new Request(url, init),
     params: opts.params ?? {},
+    url: new URL(url),
   };
 }
 
@@ -101,11 +103,24 @@ describe('POST /api/username — claim a handle', () => {
     expect(await H.store.users.getUsername('u2')).toBeNull();
   });
 
-  it('is claim-once (session already has one)', async () => {
+  it('allows changing to a free handle, keeping the old one resolving', async () => {
     H.user = asUser('u1', 'robyrew');
-    const { status, body } = await call(usernamePOST, { method: 'POST', body: { username: 'newname' } });
-    expect(status).toBe(409);
-    expect(body).toMatchObject({ error: 'already_set', username: 'robyrew' });
+    const { status, body } = await call(usernamePOST, { method: 'POST', body: { username: 'robyrew2' } });
+    expect(status).toBe(200);
+    expect(body).toMatchObject({ ok: true, username: 'robyrew2', previous: 'robyrew' });
+    expect(await H.store.users.getUsername('u1')).toBe('robyrew2');
+    // the old handle still points at u1's current handle (for a 301)
+    expect(await H.store.users.resolveUsername('robyrew')).toMatchObject({ userId: 'u1', canonical: 'robyrew2' });
+  });
+
+  it('availability check: own handle is available, junk is invalid', async () => {
+    H.user = asUser('u1', 'robyrew2');
+    expect(
+      (await call(usernameGET, { url: 'https://maps.robyrew.com/api/username?check=robyrew2' })).body,
+    ).toMatchObject({ available: true }); // your own current handle
+    expect(
+      (await call(usernameGET, { url: 'https://maps.robyrew.com/api/username?check=AB' })).body,
+    ).toMatchObject({ valid: false }); // too short
   });
 
   it('rejects an invalid handle', async () => {
@@ -196,7 +211,7 @@ describe('/api/links — short-link creation', () => {
     expect(body.error).toBe('username_required');
   });
 
-  it('custom slug builds a vanity /x/<username>/<slug> link', async () => {
+  it('custom slug builds a vanity /@<username>/<slug> link', async () => {
     H.user = asUser('u4', 'roby4');
     const { status, body } = await call(linksPOST, {
       url: 'https://maps.robyrew.com/api/links',
@@ -204,7 +219,19 @@ describe('/api/links — short-link creation', () => {
       body: { lat: 41.1, lng: 1.2, label: 'La Casa', customSlug: 'la casa!', indefinite: true },
     });
     expect(status).toBe(200);
-    expect(String(body.url)).toMatch(/\/x\/roby4\/la-casa$/); // slugified
+    expect(String(body.url)).toMatch(/\/@roby4\/la-casa$/); // slugified, @ handle
+  });
+
+  it('creates a one-time link', async () => {
+    H.user = asUser('u4', 'roby4');
+    const { status, body } = await call(linksPOST, {
+      url: 'https://maps.robyrew.com/api/links',
+      method: 'POST',
+      body: { lat: 10, lng: 20, indefinite: true, oneTime: true },
+    });
+    expect(status).toBe(200);
+    expect(body.oneTime).toBe(true);
+    expect(await H.store.links.get(String(body.slug))).toMatchObject({ oneTime: true });
   });
 
   it('anonymous create requires an anonId', async () => {

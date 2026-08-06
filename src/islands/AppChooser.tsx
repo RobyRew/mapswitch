@@ -12,6 +12,7 @@ export interface ChooserStrings {
   copied: string;
   radarbotSetup: string;
   radarbotSetupLink: string;
+  makeYourOwn: string;
   shareActions: ShareActionsStrings;
 }
 
@@ -19,15 +20,19 @@ interface Props {
   match: Match;
   platform: Platform;
   strings: ChooserStrings;
+  // 'full' (home): share panel always shown. 'open' (a shared link): collapsed
+  // behind a "Make your own link" toggle so the open view stays clean.
+  variant?: 'full' | 'open';
 }
 
 // One-time Apple Shortcut setup for Radarbot (no public URL scheme on iOS).
 const RADARBOT_HELP = 'https://github.com/RobyRew/mapswitch#radarbot-on-ios';
 
-export default function AppChooser({ match, platform, strings }: Props) {
+export default function AppChooser({ match, platform, strings, variant = 'full' }: Props) {
   const { prefs, update } = usePreferences();
   const [remember, setRemember] = useState(true);
   const [copiedApp, setCopiedApp] = useState<string | null>(null);
+  const [makeOwn, setMakeOwn] = useState(false);
 
   // Respect the user's app visibility + ordering (Settings → "Your map apps").
   const options = useMemo(() => {
@@ -145,9 +150,25 @@ export default function AppChooser({ match, platform, strings }: Props) {
         </label>
       </div>
 
-      <div className="border-t border-border pt-4">
-        <ShareActions target={match} strings={strings.shareActions} />
-      </div>
+      {variant === 'open' ? (
+        <div className="border-t border-border pt-4">
+          {makeOwn ? (
+            <ShareActions target={match} strings={strings.shareActions} />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMakeOwn(true)}
+              className="btn btn-glass w-full justify-center"
+            >
+              <span aria-hidden="true">✨</span> {strings.makeYourOwn}
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="border-t border-border pt-4">
+          <ShareActions target={match} strings={strings.shareActions} />
+        </div>
+      )}
     </div>
   );
 }

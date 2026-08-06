@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { buildShareUrl } from '@/lib/share/encode';
-import { EXPIRY_TOKENS, expiryMinutes, DEFAULT_EXPIRY, type ExpiryToken } from '@/lib/share/expiry';
+import { EXPIRY_TOKENS, expiryMinutes, isOneTime, DEFAULT_EXPIRY, type ExpiryToken } from '@/lib/share/expiry';
 import { normalizeSlug, isValidSlug } from '@/lib/share/slug';
 import type { BuildTarget } from '@/lib/providers/types';
 import type { ExpiryStrings } from '@/i18n/strings';
@@ -158,6 +158,7 @@ export default function ShareActions({
         const mins = expiryMinutes(expiry);
         if (mins === null) body.indefinite = true;
         else body.expiresInMinutes = mins;
+        if (isOneTime(expiry)) body.oneTime = true;
         if (username && customSlug.trim()) body.customSlug = customSlug.trim();
       } else {
         body.anonId = getAnonId();

@@ -12,12 +12,23 @@ export const users = sqliteTable(
     logtoSub: text('logto_sub').notNull().unique(), // Logto subject — the link to identity
     email: text('email'), // cached from the ID token; may go stale
     name: text('name'),
-    username: text('username'), // public handle for /x/<username>/<slug> (claimed in-app)
+    username: text('username'), // public handle for /@<username>/<slug> (claimed in-app, changeable)
     emailVerified: integer('emailVerified', { mode: 'boolean' }).notNull().default(false),
     createdAt: integer('createdAt').notNull(), // Date.now() ms
   },
   (t) => [uniqueIndex('users_username_unique').on(t.username)],
 );
+
+// Old usernames after a change. Keeps previously-shared /@<old>/<slug> links
+// resolving (they 301 to the user's current handle) and reserves the old name so
+// nobody else can claim it. One row per retired handle.
+export const usernameAliases = sqliteTable('username_aliases', {
+  username: text('username').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: integer('createdAt').notNull(), // Date.now() ms
+});
 
 // Server-side Logto session store. The browser holds only an opaque `ms_sid`
 // cookie; the OIDC tokens live here (never in browser JS). `data` is the JSON
@@ -49,7 +60,8 @@ export const savedLinks = sqliteTable(
     lat: real('lat').notNull(),
     lng: real('lng').notNull(),
     label: text('label'),
-    customSlug: text('customSlug'), // optional vanity slug, unique per user → /x/<username>/<customSlug>
+    customSlug: text('customSlug'), // optional vanity slug, unique per user → /@<username>/<customSlug>
+    oneTime: integer('oneTime', { mode: 'boolean' }).notNull().default(false), // self-delete on first open
     createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
     expiresAt: integer('expiresAt', { mode: 'timestamp' }),
     hitCount: integer('hitCount').notNull().default(0),
