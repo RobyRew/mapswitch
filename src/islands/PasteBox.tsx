@@ -179,6 +179,13 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
         <textarea
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            // Enter submits (the common case: one pasted link); Shift+Enter for a newline.
+            if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+              e.preventDefault();
+              void resolve(value);
+            }
+          }}
           placeholder={strings.placeholder}
           rows={2}
           className="field resize-y text-base"

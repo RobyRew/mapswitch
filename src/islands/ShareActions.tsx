@@ -270,7 +270,7 @@ export default function ShareActions({
               {username ? (
                 <div className="flex flex-col gap-1">
                   <label className="flex items-center gap-1 text-sm text-text-2">
-                    <span className="shrink-0 font-mono text-text-3">/x/{username}/</span>
+                    <span className="shrink-0 font-mono text-text-3">/@{username}/</span>
                     <input
                       value={customSlug}
                       onChange={(e) => setCustomSlug(e.target.value)}
@@ -281,7 +281,7 @@ export default function ShareActions({
                   {customSlug.trim() && (
                     <p className="break-all text-xs">
                       <span className="text-text-3">
-                        {origin}/x/{username}/
+                        {origin}/@{username}/
                       </span>
                       <span className="text-text">{normalizedSlug}</span> {slugHint()}
                     </p>
