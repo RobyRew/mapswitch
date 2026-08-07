@@ -23,6 +23,13 @@
     "try": "Try",
     "error": "Couldn't read a location from that. Try another link, or paste coordinates like 48.8584, 2.2945."
   },
+  "via": {
+    "browser": "Resolved in your browser — no request left your device.",
+    "expand": "Expanded on our server — short links can't be followed from the browser.",
+    "geocode": "Looked up on our server — place names need a geocoder.",
+    "device": "From your device's location — no request left your device.",
+    "ip": "Approximate location from your network, resolved on our server — adjust the coordinates if needed."
+  },
   "chooser": {
     "openIn": "Open in…",
     "remember": "Remember my choice",

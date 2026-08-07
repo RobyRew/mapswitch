@@ -23,6 +23,13 @@
     "try": "Prueba",
     "error": "No se pudo leer una ubicación. Prueba con otro enlace o pega coordenadas como 48.8584, 2.2945."
   },
+  "via": {
+    "browser": "Resuelto en tu navegador: no salió ninguna petición de tu dispositivo.",
+    "expand": "Expandido en nuestro servidor: los enlaces cortos no se pueden seguir desde el navegador.",
+    "geocode": "Buscado en nuestro servidor: los nombres de lugares necesitan un geocodificador.",
+    "device": "Desde la ubicación de tu dispositivo: no salió ninguna petición.",
+    "ip": "Ubicación aproximada según tu red, resuelta en nuestro servidor: ajusta las coordenadas si hace falta."
+  },
   "chooser": {
     "openIn": "Abrir en…",
     "remember": "Recordar mi elección",

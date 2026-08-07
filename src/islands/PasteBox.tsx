@@ -5,6 +5,17 @@ import type { Match } from '@/lib/providers/types';
 import { usePlatform } from './hooks/usePlatform';
 import AppChooser, { type ChooserStrings } from './AppChooser';
 
+/** How the current result was obtained — surfaced to the user for transparency. */
+export type Via = 'browser' | 'expand' | 'geocode' | 'device' | 'ip';
+
+export interface ViaStrings {
+  browser: string;
+  expand: string;
+  geocode: string;
+  device: string;
+  ip: string;
+}
+
 export interface PasteStrings {
   placeholder: string;
   resolve: string;
@@ -12,6 +23,7 @@ export interface PasteStrings {
   paste: string;
   try: string;
   error: string;
+  via: ViaStrings;
   useLocation: string;
   locating: string;
   locationDenied: string;
@@ -29,12 +41,12 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
-  const [approx, setApprox] = useState(false);
+  const [via, setVia] = useState<Via | null>(null);
 
   const resolve = useCallback(
     async (input: string) => {
       setError(null);
-      setApprox(false);
+      setVia(null);
       setMatch(null);
       const trimmed = input.trim();
       if (!trimmed) return;
@@ -43,6 +55,7 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
       const direct = parsePure(trimmed);
       if (direct) {
         setMatch(direct);
+        setVia('browser');
         return;
       }
 
@@ -56,8 +69,12 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
           body: JSON.stringify({ input: trimmed }),
         });
         const data = (await res.json()) as { match?: Match; error?: string; message?: string };
-        if (res.ok && data.match) setMatch(data.match);
-        else setError(data.message || strings.error);
+        if (res.ok && data.match) {
+          setMatch(data.match);
+          // The client already tried parsePure, so a server hit is either a
+          // short-link expansion or a place-name geocode.
+          setVia(data.match.source === 'geocoded' ? 'geocode' : 'expand');
+        } else setError(data.message || strings.error);
       } catch {
         setError(strings.error);
       } finally {
@@ -105,7 +122,7 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
       const d = (await res.json()) as { lat?: number; lng?: number; label?: string };
       if (typeof d.lat !== 'number' || typeof d.lng !== 'number') return false;
       setValue(`${d.lat.toFixed(6)}, ${d.lng.toFixed(6)}`);
-      setApprox(true);
+      setVia('ip');
       setError(null);
       setMatch({ lat: roundCoord(d.lat), lng: roundCoord(d.lng), label: d.label, source: 'coords' });
       setLocating(false);
@@ -117,7 +134,7 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
 
   function detectLocation() {
     setError(null);
-    setApprox(false);
+    setVia(null);
     setMatch(null);
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setLocating(true);
@@ -133,7 +150,7 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
     const onOk = (pos: GeolocationPosition) => {
       const { latitude, longitude } = pos.coords;
       setValue(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
-      setApprox(false);
+      setVia('device');
       setMatch({ lat: roundCoord(latitude), lng: roundCoord(longitude), source: 'coords' });
       setLocating(false);
     };
@@ -223,7 +240,12 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
           {error}
         </p>
       )}
-      {approx && <p className="px-1 text-xs text-text-3">📍 {strings.approxLocation}</p>}
+      {match && via && (
+        <p className="flex items-start gap-1.5 px-1 text-xs text-text-3">
+          <span aria-hidden="true">{via === 'browser' || via === 'device' ? '🔒' : '☁️'}</span>
+          <span>{strings.via[via]}</span>
+        </p>
+      )}
 
       {match && (
         <div className="panel p-4 sm:p-5" style={{ animation: 'var(--animate-slide-up)' }}>

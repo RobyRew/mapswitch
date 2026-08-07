@@ -23,6 +23,13 @@
     "try": "Prova",
     "error": "No s'ha pogut llegir cap ubicació. Prova amb un altre enllaç o enganxa coordenades com 48.8584, 2.2945."
   },
+  "via": {
+    "browser": "Resolt al teu navegador: no ha sortit cap petició del teu dispositiu.",
+    "expand": "Expandit al nostre servidor: els enllaços curts no es poden seguir des del navegador.",
+    "geocode": "Cercat al nostre servidor: els noms de lloc necessiten un geocodificador.",
+    "device": "Des de la ubicació del teu dispositiu: no ha sortit cap petició.",
+    "ip": "Ubicació aproximada segons la teva xarxa, resolta al nostre servidor: ajusta les coordenades si cal."
+  },
   "chooser": {
     "openIn": "Obre a…",
     "remember": "Recorda la meva elecció",

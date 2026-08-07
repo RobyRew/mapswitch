@@ -23,6 +23,13 @@
     "try": "Încearcă",
     "error": "Nu am putut citi nicio locație. Încearcă alt link sau lipește coordonate ca 48.8584, 2.2945."
   },
+  "via": {
+    "browser": "Rezolvat în browserul tău — nicio cerere nu a părăsit dispozitivul.",
+    "expand": "Extins pe serverul nostru — linkurile scurte nu pot fi urmărite din browser.",
+    "geocode": "Căutat pe serverul nostru — numele de locuri necesită un geocodificator.",
+    "device": "De la locația dispozitivului tău — nicio cerere nu a părăsit dispozitivul.",
+    "ip": "Locație aproximativă din rețeaua ta, rezolvată pe serverul nostru — ajustează coordonatele dacă e nevoie."
+  },
   "chooser": {
     "openIn": "Deschide în…",
     "remember": "Reține alegerea mea",
