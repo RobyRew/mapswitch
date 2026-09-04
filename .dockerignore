@@ -7,6 +7,12 @@ dist
 .idea
 .env
 .env.*
+
+# .env.production is COMMITTED on purpose: it holds only PUBLIC_* analytics
+# identifiers, which Astro bakes into the shipped HTML anyway. It must reach the
+# build context or the Umami script is silently omitted -- excluding it here is
+# what made the fix look deployed while changing nothing (2026-09-04).
+!.env.production
 !.env.example
 tests
 **/*.test.ts
