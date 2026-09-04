@@ -18,6 +18,9 @@ const isActive = (seg: string) => here.endsWith(`/${seg}`) || here.includes(`/${
 
 const umamiSrc = import.meta.env.PUBLIC_UMAMI_SCRIPT_URL;
 const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
+// Pins reporting to this hostname — without it a fork, a preview deploy or
+// localhost would post into the same dashboard and corrupt the numbers.
+const umamiDomains = import.meta.env.PUBLIC_UMAMI_DOMAINS;
 ---
 
 <!doctype html>
@@ -49,7 +52,7 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
       })();
     </script>
     <script is:inline src="/sw-register.js"></script>
-    {umamiSrc && umamiId && <script is:inline defer src={umamiSrc} data-website-id={umamiId}></script>}
+    {umamiSrc && umamiId && <script is:inline defer src={umamiSrc} data-website-id={umamiId} data-domains={umamiDomains} data-do-not-track="true"></script>}
   </head>
   <body class="flex min-h-dvh flex-col">
     <header class="safe-top sticky top-0 z-50">

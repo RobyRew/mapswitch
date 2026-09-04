@@ -9,6 +9,8 @@ node_modules/
 .env
 .env.*
 !.env.example
+# Non-secret PUBLIC_* analytics config — see the file header.
+!.env.production
 
 # data (future SQLite volume)
 data/

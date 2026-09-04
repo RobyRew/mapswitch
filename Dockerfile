@@ -27,6 +27,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=4321
+# server.mjs builds the CSP for SSR routes from process.env, while static routes
+# get it from .env.production at build time. Both must name the same origin or
+# the analytics script is allow-listed on some pages and blocked on others.
+# Keep in sync with .env.production; a Dokploy env var still overrides it.
+ENV PUBLIC_UMAMI_SCRIPT_URL=https://stats.cosmincalin.es/script.js
 
 RUN addgroup -S app && adduser -S app -G app
 
