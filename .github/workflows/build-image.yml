@@ -1,0 +1,22 @@
+# Build definition lives in RobyRew/platform so it is maintained once for the
+# whole fleet. This repo only says WHEN to build and which secret to pass.
+name: Build and publish image
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**', '.vscode/**']
+  workflow_dispatch:
+
+jobs:
+  build:
+    # Declared HERE, not only in the reusable workflow. A called workflow can only
+    # reduce the caller's permissions, never escalate, and this repo's
+    # default_workflow_permissions is `read` — so pushing to GHCR fails at startup
+    # unless the caller grants packages: write.
+    permissions:
+      contents: read
+      packages: write
+    uses: RobyRew/platform/.github/workflows/build-image.yml@main
+    secrets:
+      DOKPLOY_DEPLOY_WEBHOOK: ${{ secrets.DOKPLOY_DEPLOY_WEBHOOK }}
