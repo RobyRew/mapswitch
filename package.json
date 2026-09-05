@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
-  "description": "Universal map link redirector — open any location in your preferred maps app",
+  "description": "Universal map link redirector \u2014 open any location in your preferred maps app",
   "scripts": {
     "dev": "astro dev --host 0.0.0.0 --port 5176",
     "build": "astro check && astro build",
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@eslint/js": "^9.18.0",
-    "@robyrew/web-config": "github:RobyRew/web-config#v0.1.1",
+    "@robyrew/web-config": "github:RobyRew/web-config#v0.2.0",
     "@tailwindcss/vite": "^4.3.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.10.0",
