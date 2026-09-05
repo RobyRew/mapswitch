@@ -17,7 +17,7 @@ export default function DefaultAppManager({ strings }: { strings: ManagerStrings
   const current = prefs.defaultProviderId ? providerById(prefs.defaultProviderId) : null;
 
   return (
-    <div className="panel-2 flex flex-col gap-3 p-4 text-sm">
+    <div className="rw-card ms-card-sm flex flex-col gap-3 p-4 text-sm">
       <div className="flex items-center justify-between gap-2">
         <span className="text-text-2">{strings.defaultLabel}</span>
         <strong className="text-text">{current ? current.name : strings.none}</strong>
@@ -48,12 +48,12 @@ export default function DefaultAppManager({ strings }: { strings: ManagerStrings
           <button
             type="button"
             onClick={() => update({ defaultProviderId: null })}
-            className="btn btn-glass btn-sm"
+            className="rw-btn rw-btn--sm"
           >
             {strings.change}
           </button>
         )}
-        <button type="button" onClick={reset} className="btn btn-glass btn-sm btn-danger">
+        <button type="button" onClick={reset} className="rw-btn rw-btn--sm rw-btn--danger">
           {strings.reset}
         </button>
       </div>

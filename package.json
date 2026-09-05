@@ -37,6 +37,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@eslint/js": "^9.18.0",
+    "@robyrew/web-config": "github:RobyRew/web-config#v0.1.1",
     "@tailwindcss/vite": "^4.3.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.10.0",

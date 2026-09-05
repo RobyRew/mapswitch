@@ -184,18 +184,18 @@ export default function ShareActions({
 
   function linkPanel(url: string, label: string) {
     return (
-      <div className="panel-2 flex flex-col gap-3 p-4">
+      <div className="rw-card ms-card-sm flex flex-col gap-3 p-4">
         <span className="text-xs font-medium uppercase tracking-wide text-text-3">{label}</span>
         <code className="block break-all font-mono text-sm text-text">{url}</code>
         <div className="flex justify-center py-1">
           <QrCode value={url} downloadLabel={strings.downloadQr} />
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => copy(url)} className="btn btn-primary btn-sm flex-1">
+          <button type="button" onClick={() => copy(url)} className="rw-btn rw-btn--primary rw-btn--sm flex-1">
             {copied ? `✓ ${strings.copied}` : strings.copy}
           </button>
           {canShare() && (
-            <button type="button" onClick={() => share(url)} className="btn btn-glass btn-sm">
+            <button type="button" onClick={() => share(url)} className="rw-btn rw-btn--sm">
               {strings.shareButton}
             </button>
           )}
@@ -226,7 +226,7 @@ export default function ShareActions({
         modeRefs.current[value] = el;
       }}
       onClick={() => selectMode(value)}
-      className="seg-item"
+      className="rw-seg__item"
     >
       {text}
     </button>
@@ -251,7 +251,7 @@ export default function ShareActions({
         className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-accent"
       />
 
-      <div role="radiogroup" aria-label={strings.linkType} onKeyDown={onGroupKey} className="seg">
+      <div role="radiogroup" aria-label={strings.linkType} onKeyDown={onGroupKey} className="rw-seg">
         {tab('neutral', strings.modeNeutral)}
         {tab('short', strings.modeShort)}
       </div>
@@ -264,7 +264,7 @@ export default function ShareActions({
           {shortNote && <p className="text-xs text-text-3">{shortNote}</p>}
         </>
       ) : (
-        <div className="panel-2 flex flex-col gap-3 p-4">
+        <div className="rw-card ms-card-sm flex flex-col gap-3 p-4">
           {signedIn ? (
             <>
               {username ? (
@@ -275,7 +275,7 @@ export default function ShareActions({
                       value={customSlug}
                       onChange={(e) => setCustomSlug(e.target.value)}
                       placeholder={strings.customSlugPlaceholder}
-                      className="field min-w-0 flex-1 !py-1.5 text-sm"
+                      className="rw-field min-w-0 flex-1 !py-1.5 text-sm"
                     />
                   </label>
                   {customSlug.trim() && (
@@ -297,7 +297,7 @@ export default function ShareActions({
                 <select
                   value={expiry}
                   onChange={(e) => setExpiry(e.target.value as ExpiryToken)}
-                  className="field w-auto !py-1.5 text-sm"
+                  className="rw-field w-auto !py-1.5 text-sm"
                 >
                   {EXPIRY_TOKENS.map((tk) => (
                     <option key={tk} value={tk}>
@@ -314,7 +314,7 @@ export default function ShareActions({
             type="button"
             onClick={createShort}
             disabled={saving || slugBlocking}
-            className="btn btn-primary self-start"
+            className="rw-btn rw-btn--primary self-start"
           >
             🔗 {strings.saveShorten}
           </button>

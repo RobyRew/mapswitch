@@ -57,7 +57,10 @@ const umamiDomains = import.meta.env.PUBLIC_UMAMI_DOMAINS;
   <body class="flex min-h-dvh flex-col">
     <header class="safe-top sticky top-0 z-50">
       <div class="mx-auto w-full max-w-2xl px-4">
-        <div class="panel-2 mt-3 flex items-center justify-between gap-3 rounded-full px-3 py-2 pl-3.5">
+        <!-- The one element on the page that floats over content, so the one
+             element made of glass. Everything below it is the opaque content
+             layer. -->
+        <div class="rw-glass mt-3 flex items-center justify-between gap-3 px-3 py-2 pl-3.5" style="--r:999px">
           <a href={path(locale)} class="group flex items-center gap-2.5" aria-label={t(locale, 'site.name')}>
             <span
               class="grid h-8 w-8 place-items-center rounded-xl shadow-sm transition group-hover:scale-105"
@@ -71,17 +74,17 @@ const umamiDomains = import.meta.env.PUBLIC_UMAMI_DOMAINS;
                 <circle cx="12" cy="10" r="2.6" fill="var(--accent)"></circle>
               </svg>
             </span>
-            <span class="text-[15px] font-semibold tracking-tight text-text">{t(locale, 'site.name')}</span>
+            <span class="text-[15px] font-semibold tracking-tight text-g-ink">{t(locale, 'site.name')}</span>
           </a>
           <nav class="flex items-center gap-1 text-sm">
             <a
               href={path(locale, 'settings')}
-              class={`rounded-full px-3 py-1.5 font-medium transition hover:text-accent ${isActive('settings') ? 'text-accent' : 'text-text-2'}`}
+              class={`rounded-full px-3 py-1.5 font-medium transition hover:text-g-ink ${isActive('settings') ? 'text-accent' : 'text-g-ink-dim'}`}
               >{t(locale, 'nav.settings')}</a
             >
             <a
               href={path(locale, 'account')}
-              class={`rounded-full px-3 py-1.5 font-medium transition hover:text-accent ${isActive('account') ? 'text-accent' : 'text-text-2'}`}
+              class={`rounded-full px-3 py-1.5 font-medium transition hover:text-g-ink ${isActive('account') ? 'text-accent' : 'text-g-ink-dim'}`}
               >{t(locale, 'nav.account')}</a
             >
             <ThemeToggle client:load label={t(locale, 'settings.theme')} />
@@ -102,14 +105,14 @@ const umamiDomains = import.meta.env.PUBLIC_UMAMI_DOMAINS;
         class="mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-text-3"
       >
         <div class="flex flex-wrap gap-4">
-          <a href={path(locale, 'use')} class="transition hover:text-accent">{t(locale, 'nav.use')}</a>
-          <a href={path(locale, 'privacy')} class="transition hover:text-accent">{t(locale, 'nav.privacy')}</a>
-          <a href={path(locale, 'about')} class="transition hover:text-accent">{t(locale, 'nav.about')}</a>
+          <a href={path(locale, 'use')} class="transition hover:text-g-ink">{t(locale, 'nav.use')}</a>
+          <a href={path(locale, 'privacy')} class="transition hover:text-g-ink">{t(locale, 'nav.privacy')}</a>
+          <a href={path(locale, 'about')} class="transition hover:text-g-ink">{t(locale, 'nav.about')}</a>
           <a
             href="https://github.com/RobyRew/mapswitch"
             target="_blank"
             rel="noreferrer"
-            class="transition hover:text-accent">GitHub</a
+            class="transition hover:text-g-ink">GitHub</a
           >
         </div>
         <span>
@@ -118,7 +121,7 @@ const umamiDomains = import.meta.env.PUBLIC_UMAMI_DOMAINS;
             href="https://github.com/robyrew"
             target="_blank"
             rel="noreferrer"
-            class="font-medium text-text-2 transition hover:text-accent">RobyRew</a
+            class="font-medium text-text-2 transition hover:text-g-ink">RobyRew</a
           >
         </span>
       </div>

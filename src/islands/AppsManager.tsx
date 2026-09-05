@@ -39,7 +39,7 @@ export default function AppsManager({ strings }: { strings: AppsManagerStrings }
   if (!loaded) return null;
 
   return (
-    <div className="panel-2 flex flex-col gap-3 p-4 text-sm">
+    <div className="rw-card ms-card-sm flex flex-col gap-3 p-4 text-sm">
       <span className="text-text-2">{strings.title}</span>
       <p className="text-xs text-text-3">{strings.hint}</p>
       <ul className="flex flex-col gap-1">

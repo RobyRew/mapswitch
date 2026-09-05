@@ -28,7 +28,7 @@ export default function ThemeToggle({ label }: { label: string }) {
       onClick={toggle}
       aria-label={label}
       title={label}
-      className="btn-glass grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"
+      className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"
     >
       <span aria-hidden="true">{theme === 'dark' ? '☀️' : '🌙'}</span>
     </button>

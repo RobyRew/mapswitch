@@ -60,7 +60,7 @@ export default function HistoryList({ strings, baseUrl }: { strings: HistoryStri
       ) : (
         <ul className="flex flex-col gap-2">
           {items.map((it) => (
-            <li key={it.slug} className="panel-2 flex items-center justify-between gap-2 p-3">
+            <li key={it.slug} className="rw-card ms-card-sm flex items-center justify-between gap-2 p-3">
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium text-text">
                   {it.label || `${it.lat}, ${it.lng}`}
@@ -73,13 +73,13 @@ export default function HistoryList({ strings, baseUrl }: { strings: HistoryStri
                 </div>
               </div>
               <div className="flex shrink-0 gap-2">
-                <button type="button" onClick={() => copy(it.slug)} className="btn btn-glass btn-sm">
+                <button type="button" onClick={() => copy(it.slug)} className="rw-btn rw-btn--sm">
                   {copied === it.slug ? strings.copied : strings.copy}
                 </button>
                 <button
                   type="button"
                   onClick={() => remove(it.slug)}
-                  className="btn btn-glass btn-sm btn-danger"
+                  className="rw-btn rw-btn--sm rw-btn--danger"
                 >
                   {strings.delete}
                 </button>

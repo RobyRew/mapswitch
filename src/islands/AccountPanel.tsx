@@ -22,11 +22,11 @@ export default function AccountPanel({ email, strings, signOutPath }: Props) {
   }, []);
 
   return (
-    <div className="panel-2 flex items-center justify-between gap-4 p-4">
+    <div className="rw-card ms-card-sm flex items-center justify-between gap-4 p-4">
       <p className="min-w-0 text-sm text-text-2">
         {strings.signedInAs} <strong className="break-all text-text">{email}</strong>
       </p>
-      <a href={signOutPath} className="btn btn-glass btn-sm shrink-0">
+      <a href={signOutPath} className="rw-btn rw-btn--sm shrink-0">
         {strings.signOut}
       </a>
     </div>

@@ -57,12 +57,12 @@ const extrasStrings = {
 
     <AppsManager client:load strings={appsStrings} />
 
-    <div class="panel-2 flex flex-col gap-3 p-4 text-sm">
+    <div class="rw-card ms-card-sm flex flex-col gap-3 p-4 text-sm">
       <span class="text-text-2">{t(locale, 'settings.language')}</span>
       <div class="flex flex-wrap gap-2">
         {
           LOCALES.map((loc) => (
-            <a href={path(loc, 'settings')} class={loc === locale ? 'btn btn-primary btn-sm' : 'chip'}>
+            <a href={path(loc, 'settings')} class={loc === locale ? 'rw-btn rw-btn--primary rw-btn--sm' : 'rw-chip'}>
               {LANG_NAMES[loc]}
             </a>
           ))

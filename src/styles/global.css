@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@robyrew/web-config/theme.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    MapSwitch — Liquid Glass design system
@@ -69,8 +70,8 @@
 }
 
 /* ── Light theme (default) ──────────────────────────────────────────────── */
-:root,
-[data-theme="light"] {
+:root:not([data-theme]),
+:root[data-theme="light"] {
   color-scheme: light;
   --surface: #ffffff;
   --surface-2: #f4f5f9;
@@ -113,7 +114,7 @@
 }
 
 /* ── Dark theme ─────────────────────────────────────────────────────────── */
-[data-theme="dark"] {
+:root[data-theme="dark"] {
   color-scheme: dark;
   --surface: #1a1a1e;
   --surface-2: #232329;
@@ -216,153 +217,71 @@ input, textarea, select, button {
 }
 
 /* ═══ Component layer — Liquid Glass primitives ════════════════════════════ */
+/* ── Bridge to @robyrew/ui ────────────────────────────────────────────────
+   The control set reads --panel/--hair/--ink/--accent. This app already had
+   equivalents under its own names, so alias rather than duplicate; the aliases
+   resolve through, so the two theme blocks above carry into every control with
+   no second set of values to keep in step.
+
+   --accent is deliberately absent: both systems use that exact name, so an
+   alias here would be a self-reference. The specificity fix above is what makes
+   this app's --accent the one that applies.
+
+   Same (0,2,0) selector pair for the same reason as the blocks above. */
+:root:not([data-theme]),
+:root[data-theme] {
+  --panel:       var(--surface);
+  --ground:      var(--surface);
+  --ground-2:    var(--surface-2);
+  --hair:        var(--border-clr);
+  --hair-soft:   color-mix(in oklab, var(--border-clr) 55%, var(--surface));
+  --ink:         var(--text);
+  --ink-2:       var(--text-2);
+  --ink-3:       var(--text-3);
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
+  --rw-danger:   var(--danger);
+  --shadow-rgb:  16 24 40;
+
+  --rw-r-card: var(--radius-2xl);
+  --rw-r-ctl:  var(--radius-lg);
+}
+
 @layer components {
-  /* Frosted panel / card */
-  .panel {
-    position: relative;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-2xl);
-    box-shadow:
-      var(--shadow-md),
-      inset 0 1px 0 var(--glass-highlight),
-      0 0 0 1px var(--glass-ring);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-  }
-  .panel-2 {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl);
-    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 0 0 1px var(--glass-ring);
-    backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-  }
+  /* ── What is left after @robyrew/ui ────────────────────────────────────
+     .panel/.panel-2/.btn/.field/.seg/.chip were a second implementation of
+     the package's control set and are gone; the markup now uses .rw-card,
+     .rw-btn, .rw-field, .rw-seg and .rw-chip directly.
 
-  /* Buttons */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    border-radius: var(--radius-full);
-    padding: 0.625rem 1.15rem;
-    font-weight: 590;
-    line-height: 1.2;
-    white-space: nowrap;
-    cursor: pointer;
-    user-select: none;
-    transition: transform 0.14s ease, background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn:disabled { opacity: 0.55; cursor: default; transform: none; }
+     They were also all GLASS — a 24px-blur panel holding an 8px-blur field
+     holding a 14px-blur button. Glass is the floating functional layer; when
+     the content inside it is glass too, the material stops distinguishing
+     anything. The content layer is opaque now and .rw-glass is reserved for
+     chrome that actually floats over the page. */
 
-  .btn-primary {
-    color: var(--accent-text);
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-    border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
-    box-shadow: var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  }
-  .btn-primary:hover:not(:disabled) { filter: brightness(1.05); box-shadow: var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.45); }
+  /* A tighter card. .rw-card publishes its radius as --rw-r for exactly this. */
+  .ms-card-sm { --rw-r: var(--radius-xl); }
 
-  .btn-glass {
-    color: var(--text);
-    background: var(--glass-bg-strong);
-    border: 1px solid var(--glass-border);
-    box-shadow: inset 0 1px 0 var(--glass-highlight), var(--shadow-xs);
-    backdrop-filter: blur(14px) saturate(160%);
-    -webkit-backdrop-filter: blur(14px) saturate(160%);
-  }
-  .btn-glass:hover:not(:disabled) { background: var(--glass-bg-strong); border-color: color-mix(in srgb, var(--accent) 40%, var(--glass-border)); }
-
-  .btn-danger { color: var(--danger); }
-  .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8125rem; }
-
-  /* Text / form fields */
-  .field {
-    width: 100%;
-    background: var(--field-bg);
-    border: 1px solid var(--border-clr);
-    border-radius: var(--radius-lg);
-    padding: 0.7rem 0.9rem;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  .field::placeholder { color: var(--text-3); }
-  .field:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
-    background: var(--glass-bg-strong);
-  }
-
-  /* Segmented control */
-  .seg {
-    display: flex;
-    gap: 0.25rem;
-    padding: 0.25rem;
-    border-radius: var(--radius-full);
-    background: var(--field-bg);
-    border: 1px solid var(--glass-border);
-    box-shadow: inset 0 1px 2px var(--glass-ring);
-  }
-  .seg-item {
-    flex: 1 1 0;
-    border-radius: var(--radius-full);
-    padding: 0.45rem 0.9rem;
-    font-weight: 560;
-    font-size: 0.875rem;
-    color: var(--text-2);
-    cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .seg-item:hover { color: var(--text); }
-  .seg-item[aria-checked="true"],
-  .seg-item[aria-selected="true"],
-  .seg-item.is-active {
-    color: var(--accent-text);
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-    box-shadow: var(--accent-glow);
-  }
-
-  /* Chips (example inputs, tags) */
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    border-radius: var(--radius-full);
-    padding: 0.35rem 0.75rem;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--text-2);
-    background: var(--glass-bg-strong);
-    border: 1px solid var(--glass-border);
-    cursor: pointer;
-    transition: transform 0.14s ease, color 0.2s ease, border-color 0.2s ease;
-  }
-  .chip:hover { color: var(--text); border-color: color-mix(in srgb, var(--accent) 45%, var(--glass-border)); transform: translateY(-1px); }
-
-  /* App tile in the "Open in…" chooser */
+  /* App tile in the "Open in…" chooser: a card that is also a button, so it
+     takes the card's surface and the interactive lift. */
   .app-tile {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     width: 100%;
-    border-radius: var(--radius-lg);
     padding: 0.85rem 0.9rem;
+    border-radius: var(--radius-lg);
     font-weight: 560;
     font-size: 0.9rem;
-    color: var(--text);
-    background: var(--glass-bg-strong);
-    border: 1px solid var(--glass-border);
-    box-shadow: inset 0 1px 0 var(--glass-highlight);
-    transition: transform 0.14s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    color: var(--ink);
+    background: var(--rw-fill);
+    border: 1px solid var(--hair);
+    cursor: pointer;
+    transition: transform 0.14s var(--rw-ease), background 0.2s var(--rw-ease), box-shadow 0.2s var(--rw-ease);
   }
-  .app-tile:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 45%, var(--glass-border)); box-shadow: var(--shadow-md), inset 0 1px 0 var(--glass-highlight); }
+  .app-tile:hover { transform: translateY(-2px); background: var(--rw-fill-2); box-shadow: var(--rw-e2); }
   .app-tile:active { transform: scale(0.98); }
   .app-tile-off { opacity: 0.45; cursor: not-allowed; }
+  .app-tile-off:hover { transform: none; box-shadow: none; }
 
   /* Inline accent link */
   .link-accent { color: var(--accent); font-weight: 500; }

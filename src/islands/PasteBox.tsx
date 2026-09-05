@@ -191,7 +191,7 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
           e.preventDefault();
           void resolve(value);
         }}
-        className="panel flex flex-col gap-4 p-4 sm:p-5"
+        className="rw-card flex flex-col gap-4 p-4 sm:p-5"
       >
         <textarea
           value={value}
@@ -205,10 +205,10 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
           }}
           placeholder={strings.placeholder}
           rows={2}
-          className="field resize-y text-base"
+          className="rw-field resize-y text-base"
         />
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <button type="submit" disabled={busy} className="btn btn-primary min-w-36 flex-1">
+          <button type="submit" disabled={busy} className="rw-btn rw-btn--primary min-w-36 flex-1">
             {busy ? (
               strings.resolving
             ) : (
@@ -217,10 +217,10 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
               </>
             )}
           </button>
-          <button type="button" onClick={pasteFromClipboard} className="btn btn-glass">
+          <button type="button" onClick={pasteFromClipboard} className="rw-btn">
             <span aria-hidden="true">📋</span> {strings.paste}
           </button>
-          <button type="button" onClick={detectLocation} disabled={locating} className="btn btn-glass">
+          <button type="button" onClick={detectLocation} disabled={locating} className="rw-btn">
             <span aria-hidden="true">📍</span> {locating ? strings.locating : strings.useLocation}
           </button>
         </div>
@@ -228,7 +228,7 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
         <div className="flex flex-wrap items-center gap-2 border-t border-border/60 pt-3">
           <span className="text-xs font-medium text-text-3">{strings.try}</span>
           {EXAMPLES.map((ex) => (
-            <button key={ex} type="button" onClick={() => fillExample(ex)} className="chip">
+            <button key={ex} type="button" onClick={() => fillExample(ex)} className="rw-chip">
               {ex}
             </button>
           ))}
@@ -248,7 +248,7 @@ export default function PasteBox({ strings }: { strings: PasteStrings }) {
       )}
 
       {match && (
-        <div className="panel p-4 sm:p-5" style={{ animation: 'var(--animate-slide-up)' }}>
+        <div className="rw-card p-4 sm:p-5" style={{ animation: 'var(--animate-slide-up)' }}>
           <AppChooser match={match} platform={platform} strings={strings.chooser} />
         </div>
       )}

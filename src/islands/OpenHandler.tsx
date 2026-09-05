@@ -61,7 +61,7 @@ export default function OpenHandler({ match, strings }: { match: Match | null; s
 
   if (!match) {
     return (
-      <div className="panel p-6 text-center text-text-2">{strings.noLocation}</div>
+      <div className="rw-card p-6 text-center text-text-2">{strings.noLocation}</div>
     );
   }
 
@@ -70,21 +70,21 @@ export default function OpenHandler({ match, strings }: { match: Match | null; s
   return (
     <div className="flex flex-col gap-6">
       {willAutoOpen && defaultOption?.href ? (
-        <div className="panel flex flex-col gap-4 p-6 text-center" style={{ animation: 'var(--animate-scale-in)' }}>
+        <div className="rw-card flex flex-col gap-4 p-6 text-center" style={{ animation: 'var(--animate-scale-in)' }}>
           <p className="text-lg font-semibold text-text">
             {strings.openingIn.replace('{{app}}', defaultProvider?.name ?? '')}
           </p>
           <div className="flex flex-wrap justify-center gap-2">
-            <a href={defaultOption.href} className="btn btn-primary">
+            <a href={defaultOption.href} className="rw-btn rw-btn--primary">
               {strings.openNow}
             </a>
-            <button type="button" onClick={() => setOverride(true)} className="btn btn-glass">
+            <button type="button" onClick={() => setOverride(true)} className="rw-btn">
               {strings.chooseDifferent}
             </button>
           </div>
         </div>
       ) : (
-        <div className="panel p-4 sm:p-5" style={{ animation: 'var(--animate-slide-up)' }}>
+        <div className="rw-card p-4 sm:p-5" style={{ animation: 'var(--animate-slide-up)' }}>
           <AppChooser match={match} platform={platform} strings={strings.chooser} variant="open" />
         </div>
       )}
@@ -98,7 +98,7 @@ export default function OpenHandler({ match, strings }: { match: Match | null; s
               .catch(() => {});
           }}
           disabled={saved}
-          className="btn btn-glass self-start"
+          className="rw-btn self-start"
         >
           {saved ? `✓ ${strings.saved}` : `💾 ${strings.savePlace}`}
         </button>

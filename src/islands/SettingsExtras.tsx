@@ -68,9 +68,9 @@ export default function SettingsExtras({ strings }: { strings: SettingsExtrasStr
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="panel-2 flex flex-col gap-3 p-4 text-sm">
+      <div className="rw-card ms-card-sm flex flex-col gap-3 p-4 text-sm">
         <span className="text-text-2">{strings.theme}</span>
-        <div className="seg max-w-xs">
+        <div className="rw-seg max-w-xs">
           {opts.map((o) => (
             <button
               key={o.id}
@@ -78,7 +78,7 @@ export default function SettingsExtras({ strings }: { strings: SettingsExtrasStr
               onClick={() => choose(o.id)}
               aria-checked={mode === o.id}
               role="radio"
-              className="seg-item"
+              className="rw-seg__item"
             >
               {o.label}
             </button>
@@ -86,10 +86,10 @@ export default function SettingsExtras({ strings }: { strings: SettingsExtrasStr
         </div>
       </div>
 
-      <div className="panel-2 flex flex-col gap-2 p-4 text-sm">
+      <div className="rw-card ms-card-sm flex flex-col gap-2 p-4 text-sm">
         <span className="text-text-2">{strings.clearData}</span>
         <p className="text-xs text-text-3">{strings.clearDataDesc}</p>
-        <button type="button" onClick={clearData} className="btn btn-glass btn-sm btn-danger mt-1 self-start">
+        <button type="button" onClick={clearData} className="rw-btn rw-btn--sm rw-btn--danger mt-1 self-start">
           {cleared ? strings.cleared : strings.clearData}
         </button>
       </div>

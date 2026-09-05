@@ -15,7 +15,7 @@ const paragraphs = ['about.p1', 'about.p2', 'about.p3'];
 <BaseLayout locale={locale} title={t(locale, 'about.title')}>
   <section class="flex flex-col gap-5">
     <h1 class="text-gradient text-3xl font-bold tracking-tight sm:text-4xl">{t(locale, 'about.title')}</h1>
-    <div class="panel flex flex-col gap-4 p-6">
+    <div class="rw-card flex flex-col gap-4 p-6">
       {paragraphs.map((key) => <p class="leading-relaxed text-text-2">{t(locale, key)}</p>)}
     </div>
   </section>

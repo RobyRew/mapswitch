@@ -15,14 +15,14 @@ const locale: Locale = isLocale(lang) ? lang : 'en';
   <section class="flex flex-col gap-5">
     <h1 class="text-gradient text-3xl font-bold tracking-tight sm:text-4xl">{t(locale, 'privacy.title')}</h1>
 
-    <div class="panel flex flex-col gap-2 p-6">
+    <div class="rw-card flex flex-col gap-2 p-6">
       <h2 class="flex items-center gap-2 text-lg font-semibold text-text">
         <span aria-hidden="true">🕶️</span>{t(locale, 'privacy.anonymousTitle')}
       </h2>
       <p class="leading-relaxed text-text-2">{t(locale, 'privacy.anonymousBody')}</p>
     </div>
 
-    <div class="panel flex flex-col gap-2 p-6">
+    <div class="rw-card flex flex-col gap-2 p-6">
       <h2 class="flex items-center gap-2 text-lg font-semibold text-text">
         <span aria-hidden="true">🔐</span>{t(locale, 'privacy.accountTitle')}
       </h2>

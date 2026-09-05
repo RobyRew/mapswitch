@@ -115,13 +115,13 @@ export default function UsernameClaim({ strings }: { strings: UsernameStrings })
   const canSave = status === 'available' && !saving;
 
   return (
-    <div className="panel-2 flex flex-col gap-2 p-4 text-sm">
+    <div className="rw-card ms-card-sm flex flex-col gap-2 p-4 text-sm">
       <span className="text-text-2">{strings.label}</span>
 
       {username && !editing ? (
         <div className="flex items-center justify-between gap-2">
           <strong className="font-mono text-text">@{username}</strong>
-          <button type="button" onClick={startEdit} className="btn btn-glass btn-sm">
+          <button type="button" onClick={startEdit} className="rw-btn rw-btn--sm">
             {strings.change}
           </button>
         </div>
@@ -134,10 +134,10 @@ export default function UsernameClaim({ strings }: { strings: UsernameStrings })
               value={value}
               onChange={(e) => setValue(e.target.value)}
               placeholder={strings.placeholder}
-              className="field min-w-0 flex-1 !py-2"
+              className="rw-field min-w-0 flex-1 !py-2"
               autoFocus
             />
-            <button type="button" onClick={save} disabled={!canSave} className="btn btn-primary btn-sm">
+            <button type="button" onClick={save} disabled={!canSave} className="rw-btn rw-btn--primary rw-btn--sm">
               {username ? strings.save : strings.claim}
             </button>
             {username && (
@@ -148,7 +148,7 @@ export default function UsernameClaim({ strings }: { strings: UsernameStrings })
                   setValue('');
                   setStatus('idle');
                 }}
-                className="btn btn-glass btn-sm"
+                className="rw-btn rw-btn--sm"
               >
                 {strings.cancel}
               </button>

@@ -43,7 +43,7 @@ export default function PlacesList({ strings }: { strings: PlacesStrings }) {
 
   function section(title: string, items: Place[], kind: 'saved' | 'opened') {
     return (
-      <div className="panel-2 flex flex-col gap-2 p-4 text-sm">
+      <div className="rw-card ms-card-sm flex flex-col gap-2 p-4 text-sm">
         <span className="text-text-2">{title}</span>
         {items.length === 0 ? (
           <p className="text-xs text-text-3">{strings.empty}</p>

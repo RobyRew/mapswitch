@@ -158,7 +158,7 @@ export default function AppChooser({ match, platform, strings, variant = 'full' 
             <button
               type="button"
               onClick={() => setMakeOwn(true)}
-              className="btn btn-glass w-full justify-center"
+              className="rw-btn w-full justify-center"
             >
               <span aria-hidden="true">✨</span> {strings.makeYourOwn}
             </button>
