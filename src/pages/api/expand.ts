@@ -5,7 +5,7 @@ import { readJson, HttpError } from '@/lib/http/guard';
 
 export const prerender = false;
 
-const Body = z.object({ url: z.string().url().max(2048) });
+const Body = z.object({ url: z.url().max(2048) });
 
 const EXPAND_MAX_HOPS = Number(process.env.EXPAND_MAX_HOPS) || 5;
 const EXPAND_TIMEOUT_MS = Number(process.env.EXPAND_TIMEOUT_MS) || 4000;
