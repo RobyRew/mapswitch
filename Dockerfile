@@ -1,9 +1,10 @@
 # syntax=docker/dockerfile:1.10
 # ─────────────────────────────────────────────────────────────────────────────
-# Stage 1: build — Node 22 LTS. better-sqlite3 compiles a native addon, so the
-# build stage needs python3/make/g++.
+# Stage 1: build — Node 26 LTS. better-sqlite3 fetches a prebuilt binding
+# (node-v147-linuxmusl) when one is published for the release and arch, and
+# compiles from source otherwise, so the build stage keeps python3/make/g++.
 # ─────────────────────────────────────────────────────────────────────────────
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 
 RUN apk add --no-cache python3 make g++
@@ -18,10 +19,10 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Stage 2: runtime — Node server (standalone adapter), non-root. node:22-alpine
+# Stage 2: runtime — Node server (standalone adapter), non-root. node:26-alpine
 # already ships libstdc++ that the better-sqlite3 binding needs.
 # ─────────────────────────────────────────────────────────────────────────────
-FROM node:22-alpine AS runtime
+FROM node:26-alpine AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production

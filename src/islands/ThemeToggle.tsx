@@ -1,31 +1,25 @@
 import { useEffect, useState } from 'react';
+import { resolveTheme, setTheme } from '@robyrew/ui/theme.js';
+import { migrateLegacyTheme } from '@/lib/theme';
 
-const KEY = 'mapswitch.theme';
-
-/** Header light/dark toggle. Persists an explicit choice (mirrors SettingsExtras). */
+/** Header light/dark toggle. Stores an explicit choice through @robyrew/ui's
+ *  setTheme (localStorage.theme), the same key the settings switch and the
+ *  pre-paint stamp read. */
 export default function ThemeToggle({ label }: { label: string }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setLocal] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    const t = document.documentElement.getAttribute('data-theme');
-    setTheme(t === 'dark' ? 'dark' : 'light');
+    migrateLegacyTheme();
+    setLocal(resolveTheme());
+    const onChange = (e: DocumentEventMap['rw:themechange']) => setLocal(e.detail.theme);
+    document.addEventListener('rw:themechange', onChange);
+    return () => document.removeEventListener('rw:themechange', onChange);
   }, []);
-
-  function toggle() {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    try {
-      localStorage.setItem(KEY, next);
-    } catch {
-      /* storage unavailable */
-    }
-    document.documentElement.setAttribute('data-theme', next);
-  }
 
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       aria-label={label}
       title={label}
       className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-base"

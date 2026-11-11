@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { initThemeControls, THEME_KEY } from '@robyrew/ui/theme.js';
+import { LEGACY_THEME_KEY, migrateLegacyTheme } from '@/lib/theme';
 
 export interface SettingsExtrasStrings {
   theme: string;
@@ -10,45 +12,22 @@ export interface SettingsExtrasStrings {
   cleared: string;
 }
 
+// localStorage keys this app owns (cleared by "Clear local data"). `theme` is
+// the shared @robyrew/ui key; the legacy one is listed for visitors who never
+// loaded a page that migrated it.
+const LOCAL_KEYS = ['mapswitch.prefs.v1', 'mapswitch.anon.id', THEME_KEY, LEGACY_THEME_KEY];
+
 type ThemeMode = 'system' | 'light' | 'dark';
-const THEME_KEY = 'mapswitch.theme';
-// localStorage keys this app owns (cleared by "Clear local data").
-const LOCAL_KEYS = ['mapswitch.prefs.v1', 'mapswitch.anon.id', 'mapswitch.theme'];
-
-function currentMode(): ThemeMode {
-  try {
-    const v = localStorage.getItem(THEME_KEY);
-    return v === 'light' || v === 'dark' ? v : 'system';
-  } catch {
-    return 'system';
-  }
-}
-
-function applyTheme(mode: ThemeMode) {
-  try {
-    if (mode === 'system') {
-      localStorage.removeItem(THEME_KEY);
-      const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', sys);
-    } else {
-      localStorage.setItem(THEME_KEY, mode);
-      document.documentElement.setAttribute('data-theme', mode);
-    }
-  } catch {
-    /* storage unavailable */
-  }
-}
 
 export default function SettingsExtras({ strings }: { strings: SettingsExtrasStrings }) {
-  const [mode, setMode] = useState<ThemeMode>('system');
   const [cleared, setCleared] = useState(false);
 
-  useEffect(() => setMode(currentMode()), []);
-
-  function choose(m: ThemeMode) {
-    setMode(m);
-    applyTheme(m);
-  }
+  // @robyrew/ui binds the [data-rw-theme-set] buttons: stores the choice,
+  // reflects it as aria-checked, and follows the OS while it is "system".
+  useEffect(() => {
+    migrateLegacyTheme();
+    initThemeControls();
+  }, []);
 
   function clearData() {
     try {
@@ -75,8 +54,7 @@ export default function SettingsExtras({ strings }: { strings: SettingsExtrasStr
             <button
               key={o.id}
               type="button"
-              onClick={() => choose(o.id)}
-              aria-checked={mode === o.id}
+              data-rw-theme-set={o.id}
               role="radio"
               className="rw-seg__item"
             >

@@ -2,6 +2,7 @@
 import '@/styles/global.css';
 import { type Locale, DEFAULT_LOCALE, alternateLinks, t, path } from '@/i18n/utils';
 import ThemeToggle from '@/islands/ThemeToggle';
+import { themeBootstrap } from '@robyrew/web-config/theme-bootstrap';
 
 interface Props {
   locale: Locale;
@@ -42,15 +43,9 @@ const umamiDomains = import.meta.env.PUBLIC_UMAMI_DOMAINS;
     <meta name="color-scheme" content="light dark" />
     {alts.map((a) => <link rel="alternate" hreflang={a.locale} href={a.href} />)}
     <link rel="alternate" hreflang="x-default" href={`/${DEFAULT_LOCALE}`} />
-    <script is:inline>
-      (function () {
-        try {
-          var stored = localStorage.getItem('mapswitch.theme');
-          var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-          document.documentElement.setAttribute('data-theme', theme);
-        } catch (e) {}
-      })();
-    </script>
+    <!-- House pre-paint theme stamp (localStorage.theme, else the OS). Its CSP
+         hash is pinned in scripts/security-headers.mjs. -->
+    <script is:inline set:html={themeBootstrap} />
     <script is:inline src="/sw-register.js"></script>
     {umamiSrc && umamiId && <script is:inline defer src={umamiSrc} data-website-id={umamiId} data-domains={umamiDomains} data-do-not-track="true"></script>}
   </head>

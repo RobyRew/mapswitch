@@ -8,16 +8,17 @@
 // middleware, runtime via process.env for the wrapper) so this stays a pure
 // function with no environment coupling.
 
-// SHA-256 hashes of the STATIC inline scripts Astro renders: our theme bootstrap
-// (BaseLayout) + Astro's two `client:load` hydration shims. Using hashes lets us
+// SHA-256 hashes of the STATIC inline scripts Astro renders: the house theme
+// bootstrap (BaseLayout, from @robyrew/web-config) + Astro's two `client:load`
+// hydration shims. Using hashes lets us
 // drop `script-src 'unsafe-inline'` while still allowing exactly these scripts —
 // and unlike a per-request nonce, hashes also work for prerendered pages.
 // Regenerate after an Astro upgrade or after adding a new client:* directive:
 //   npm run build && node scripts/csp-hashes.mjs
 const INLINE_SCRIPT_HASHES = [
-  "'sha256-YmRmj8JZSFEeMG2aZy0MxpRcOtpAiWGhtr4oMKryW50='", // theme bootstrap
-  "'sha256-QzWFZi+FLIx23tnm9SBU4aEgx4x8DsuASP07mfqol/c='", // astro client:load shim
-  "'sha256-SaCkFfPruIdTXT8/97JArQmGxiJAL2o4bBDvSgJ5y3Q='", // astro-island runtime (Astro 7)
+  "'sha256-iM9FQgYDc5UmXX6BFmgSgPMHM0/EfPCOavc3EhWdsV0='", // theme bootstrap (@robyrew/ui 0.4.0 themeBootstrap)
+  "'sha256-1BvDVWLr3QCC20uHhUDi27eDFVJpk1uMQJGIWKUks2I='", // astro client:load shim (Astro 7.4)
+  "'sha256-UIrFqcaitjA3OKa9mHKajg3N+0Y7tW9+y0o3QmMFeZQ='", // astro-island runtime (Astro 7.4)
 ];
 
 /** Origin of a script URL (for allow-listing umami), or null if unset/invalid. */

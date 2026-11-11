@@ -17,15 +17,14 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
     "types": ["node"],
     "paths": {
-      "@/*": ["src/*"],
-      "@lib/*": ["src/lib/*"],
-      "@providers/*": ["src/lib/providers/*"],
-      "@islands/*": ["src/islands/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@i18n/*": ["src/i18n/*"]
+      "@/*": ["./src/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@providers/*": ["./src/lib/providers/*"],
+      "@islands/*": ["./src/islands/*"],
+      "@layouts/*": ["./src/layouts/*"],
+      "@i18n/*": ["./src/i18n/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*", "astro.config.mjs", ".astro/types.d.ts"],

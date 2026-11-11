@@ -98,13 +98,8 @@
   --aurora-2: rgba(90, 200, 250, 0.24);
   --aurora-3: rgba(140, 120, 255, 0.20);
 
-  /* Glass primitives */
-  --glass-bg: rgba(255, 255, 255, 0.62);
+  /* Backing for the one translucent panel in [lang]/index.astro */
   --glass-bg-strong: rgba(255, 255, 255, 0.82);
-  --glass-border: rgba(255, 255, 255, 0.7);
-  --glass-ring: rgba(10, 12, 20, 0.06);
-  --glass-highlight: rgba(255, 255, 255, 0.9);
-  --field-bg: rgba(255, 255, 255, 0.72);
 
   --shadow-xs-val: 0 1px 2px rgba(16, 24, 40, 0.04);
   --shadow-sm-val: 0 2px 8px rgba(16, 24, 40, 0.06);
@@ -140,12 +135,7 @@
   --aurora-2: rgba(48, 170, 255, 0.24);
   --aurora-3: rgba(120, 90, 255, 0.26);
 
-  --glass-bg: rgba(34, 34, 42, 0.55);
   --glass-bg-strong: rgba(28, 28, 34, 0.78);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-ring: rgba(0, 0, 0, 0.4);
-  --glass-highlight: rgba(255, 255, 255, 0.12);
-  --field-bg: rgba(255, 255, 255, 0.05);
 
   --shadow-xs-val: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-sm-val: 0 2px 10px rgba(0, 0, 0, 0.35);
